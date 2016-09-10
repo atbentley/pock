@@ -1,10 +1,11 @@
-overrides = ('_add_expectation', '_expectations', '_members')
+overrides = ('_add_expectation', '_expectations', '_invocations', '_members')
 
 
 class Mock(object):
     def __init__(self):
         self._expectations = []
         self._members = {}
+        self._invocations = []
 
     def _add_expectation(self, expectation):
         self._expectations.append(expectation)
@@ -20,6 +21,7 @@ class Mock(object):
             return sub_mock
 
     def __call__(self, *args, **kwargs):
+        self._invocations.append((args, kwargs))
         for expectation in self._expectations:
             if expectation.args == args and expectation.kwargs == kwargs:
                 return expectation.result

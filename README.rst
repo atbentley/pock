@@ -26,6 +26,9 @@ my_mock.something(1)  # 'a'
 my_mock.something(2)  # 'b'
 my_mock.something()  # None
 my_mock.something_else()  # None
+
+verify(my_mock).something(1)  # True
+verify(my_mock).other()  # VerificationError
 ```
 
 
