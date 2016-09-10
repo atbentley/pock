@@ -1,5 +1,10 @@
 from .expectation import ExpectationBuilder
 from .verification import VerificationBuilder
+from .mock import Mock
+
+
+def mock():
+    return Mock()
 
 
 def when(mock):
