@@ -28,7 +28,7 @@ class ExpectationBuilder(object):
             self.match_criteria_defined = True
             self.define_match_criteria(args, kwargs)
             return self
-        raise TypeError("'{name}' object is not callable")
+        raise TypeError("'{name}' object is not callable".format(name=self.__class__.__name__))
 
     def define_method_name(self, method_name):
         self.expectation.method_name = method_name
