@@ -1,45 +1,45 @@
 Pock
 ====
 
-Pock is a python mocking framework.
+mocking in python
 
 
 Installation
 ------------
 
-```
-pip install pock
-```
+.. code-block::
+
+  pip install pock
 
 
 Usage
 -----
 
-```
-from pock import when, Mock
+.. code-block:: python
 
-my_mock = Mock()
-when(my_mock).something(1).then_return('a')
-when(my_mock).something(2).then_return('b')
+  from pock import when, Mock
 
-my_mock.something(1)  # 'a'
-my_mock.something(2)  # 'b'
-my_mock.something()  # None
-my_mock.something_else()  # None
+  my_mock = Mock()
+  when(my_mock).something(1).then_return('a')
+  when(my_mock).something(2).then_return('b')
 
-verify(my_mock).something(1)  # True
-verify(my_mock).other()  # VerificationError
-```
+  my_mock.something(1)  # 'a'
+  my_mock.something(2)  # 'b'
+  my_mock.something()  # None
+  my_mock.something_else()  # None
+
+  verify(my_mock).something(1)  # True
+  verify(my_mock).other()  # VerificationError
 
 
 Testing
 -------
 
-```
-pip install plank
-plank install_requirements
-plank tests
-```
+.. code-block::
+
+  pip install plank
+  plank install_requirements
+  plank tests
 
 
 License
