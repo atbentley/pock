@@ -57,6 +57,6 @@ def package():
 
 
 @task
-@depends('install_requirements', 'check_requirements', 'tests', 'package')
+@depends('check_requirements', 'install_requirements', 'tests', 'package')
 def build():
     pass
