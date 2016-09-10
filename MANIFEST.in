@@ -1,0 +1,10 @@
+include README.rst
+include LICENSE
+include CHANGES
+include requirements.txt
+include build-requirements.txt
+
+graft tests
+
+global-exclude *.pyc
+global-exclude */__pycache__
