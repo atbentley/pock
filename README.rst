@@ -36,8 +36,9 @@ Testing
 -------
 
 ```
-pip install -r requirements.txt -r build-requirements.txt
-py.test tests
+pip install plank
+plank install_requirements
+plank tests
 ```
 
 
