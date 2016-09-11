@@ -15,6 +15,8 @@ Installation
 Usage
 -----
 
+Creating a basic mock:
+
 .. code-block:: python
 
   from pock import when, Mock
@@ -30,6 +32,26 @@ Usage
 
   verify(my_mock).something(1)  # True
   verify(my_mock).other()  # VerificationError
+
+
+Mocking properties:
+
+.. code-block:: python
+
+  property_mock = mock()
+  when(property_mock).age.then_return(24)
+  property_mock.age  # 24
+  verify(property_mock).age  # True
+
+
+Mocking top level functions:
+
+.. code-block:: python
+
+  function_mock = mock()
+  when(function_mock)('a').then_return(1)
+  function_mock('a')  # 1
+  verify(fuction_mock)('a')  # True
 
 
 Testing
