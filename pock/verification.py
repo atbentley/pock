@@ -14,6 +14,13 @@ class VerificationBuilder(object):
             return self.has_been_called_with
         return super(VerificationBuilder, self).__getattribute__(name)
 
+    def __call__(self, *args, **kwargs):
+        method_name_has_been_defined = super(VerificationBuilder, self).__getattribute__('method_name') is not None
+        if not method_name_has_been_defined:
+            self.method_name = '__call__'
+            return self.has_been_called_with(*args, **kwargs)
+        raise TypeError("'{name}' object is not callable".format(name=self.__class__.__name__))
+
     def has_been_called_with(self, *args, **kwargs):
         sub_mock = getattr(self.mock, self.method_name)
         if (args, kwargs) in sub_mock._invocations:

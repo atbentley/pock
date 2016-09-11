@@ -41,6 +41,23 @@ def test_subsequent_attribute_access_does_not_override_method_name(expectation_b
     assert expectation_builder.expectation.method_name == method_name
 
 
+def test_calling_expectation_builder_before_defining_method_name_sets_method_name_as_call(expectation_builder):
+    """ :type expectation_builder: ExpectationBuilder """
+    expectation_builder()
+
+    assert expectation_builder.expectation.method_name == '__call__'
+
+
+def test_calling_expectation_builder_before_defining_method_name_adds_expectation_to_mock(expectation_builder, mock):
+    """
+    :type expectation_builder: ExpectationBuilder
+    :type mock: Mock
+    """
+    expectation_builder()
+
+    assert expectation_builder.expectation in mock._expectations
+
+
 def test_expectation_builder_records_args_and_kwargs_when_called(callable_expectation_builder):
     """ :type callable_expectation_builder: ExpectationBuilder """
     args = (1, 5, 2, 7)

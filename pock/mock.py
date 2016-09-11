@@ -16,7 +16,10 @@ class Mock(object):
         elif name in self._members:
             return self._members[name]
         else:
-            sub_mock = Mock()
+            if name == '__call__':
+                sub_mock = self
+            else:
+                sub_mock = Mock()
             self._members[name] = sub_mock
             return sub_mock
 

@@ -35,12 +35,6 @@ def test_subsequent_access_throws_error(expectation_builder):
         getattr(expectation_builder, 'subsequent_attribute_access')
 
 
-def test_expectation_builder_is_not_callable_before_method_name_is_defined(expectation_builder):
-    """ :type expectation_builder: ExpectationBuilder """
-    with pytest.raises(TypeError):
-        expectation_builder()
-
-
 def test_expectation_builder_is_not_callable_after_match_criteria_recorded(callable_expectation_builder):
     """ :type callable_expectation_builder: ExpectationBuilder """
     callable_expectation_builder()
