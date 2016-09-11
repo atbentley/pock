@@ -39,7 +39,7 @@ def test_getattribute_the_same_sub_mock_for_multiple_access(mock):
 
 def test_call_returns_value_if_expectation_matches(mock):
     expected_value = 'returned'
-    mock._add_expectation(Expectation(None, (1,), {}, expected_value))
+    mock._add_call_expectation(Expectation(None, (1,), {}, expected_value))
 
     actual_value = mock(1)
 

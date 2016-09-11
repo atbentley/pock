@@ -26,36 +26,36 @@ def callable_expectation_builder(mock, method_name):
     return ExpectationBuilder(mock, expectation=Expectation(method_name, None, None, None))
 
 
-def test_first_attribute_access_defines_method_name(expectation_builder, method_name):
+def test_first_attribute_access_defines_name(expectation_builder, method_name):
     """ :type expectation_builder: ExpectationBuilder """
     getattr(expectation_builder, method_name)
 
-    assert expectation_builder.expectation.method_name == method_name
+    assert expectation_builder.expectation.name == method_name
 
 
-def test_subsequent_attribute_access_does_not_override_method_name(expectation_builder, method_name):
+def test_subsequent_attribute_access_does_not_override_name(expectation_builder, method_name):
     """ :type expectation_builder: ExpectationBuilder """
     getattr(expectation_builder, method_name)
-    getattr(expectation_builder, 'method_name_defined')
+    getattr(expectation_builder, 'name_defined')
 
-    assert expectation_builder.expectation.method_name == method_name
+    assert expectation_builder.expectation.name == method_name
 
 
-def test_calling_expectation_builder_before_defining_method_name_sets_method_name_as_call(expectation_builder):
+def test_calling_expectation_builder_before_defining_name_sets_name_as_call(expectation_builder):
     """ :type expectation_builder: ExpectationBuilder """
     expectation_builder()
 
-    assert expectation_builder.expectation.method_name == '__call__'
+    assert expectation_builder.expectation.name == '__call__'
 
 
-def test_calling_expectation_builder_before_defining_method_name_adds_expectation_to_mock(expectation_builder, mock):
+def test_calling_expectation_builder_before_defining_name_adds_expectation_to_mock(expectation_builder, mock):
     """
     :type expectation_builder: ExpectationBuilder
     :type mock: Mock
     """
     expectation_builder()
 
-    assert expectation_builder.expectation in mock._expectations
+    assert expectation_builder.expectation in mock._call_expectations
 
 
 def test_expectation_builder_records_args_and_kwargs_when_called(callable_expectation_builder):
@@ -76,7 +76,7 @@ def test_expectation_builder_adds_expectation_to_sub_mock_when_called(callable_e
     """
     callable_expectation_builder()
 
-    assert callable_expectation_builder.expectation in getattr(mock, method_name)._expectations
+    assert callable_expectation_builder.expectation in getattr(mock, method_name)._call_expectations
 
 
 def test_defining_a_result_without_defining_match_criteria_will_create_a_property(expectation_builder, mock):
@@ -86,4 +86,4 @@ def test_defining_a_result_without_defining_match_criteria_will_create_a_propert
     """
     expectation_builder.property.then_return(5)
 
-    assert expectation_builder.expectation == mock._properties[expectation_builder.expectation.method_name]
+    assert expectation_builder.expectation == mock._property_expectations[expectation_builder.expectation.name]

@@ -5,7 +5,7 @@ from pock.expectation import ExpectationBuilder
 
 class FakeMock(object):
     def __getattribute__(self, name):
-        if name == '_add_expectation':
+        if name == '_add_call_expectation':
             return lambda _: None
         return self
 
