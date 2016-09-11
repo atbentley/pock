@@ -1,5 +1,6 @@
 import pytest
 
+from pock.expectation import Expectation
 from pock.mock import Mock
 from pock.verification import VerificationBuilder, VerificationError
 
@@ -37,4 +38,15 @@ def test_calling_verification_builder_before_method_name_defined_checks_invocati
     """
     mock(2)
 
-    assert verification_builder(2)
+    assert verification_builder(2) is True
+
+
+def test_accessing_a_property_returns_true_if_that_property_was_called(verification_builder, mock):
+    """
+    :type verification_builder: VerificationBuilder
+    :type mock: Mock
+    """
+    mock._add_property(Expectation('property', None, None, None))
+    mock.property
+
+    assert verification_builder.property is True

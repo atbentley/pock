@@ -45,4 +45,7 @@ class ExpectationBuilder(object):
         getattr(self.mock, self.expectation.method_name)._add_expectation(self.expectation)
 
     def then_return(self, value):
+        if not self.match_criteria_defined:
+            self.match_criteria_defined = True
+            self.mock._add_property(self.expectation)
         self.expectation.result = value

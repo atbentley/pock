@@ -77,3 +77,13 @@ def test_expectation_builder_adds_expectation_to_sub_mock_when_called(callable_e
     callable_expectation_builder()
 
     assert callable_expectation_builder.expectation in getattr(mock, method_name)._expectations
+
+
+def test_defining_a_result_without_defining_match_criteria_will_create_a_property(expectation_builder, mock):
+    """
+    :type expectation_builder: ExpectationBuilder
+    :type mock: Mock
+    """
+    expectation_builder.property.then_return(5)
+
+    assert expectation_builder.expectation == mock._properties[expectation_builder.expectation.method_name]
