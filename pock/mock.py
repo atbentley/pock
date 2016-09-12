@@ -30,7 +30,7 @@ class Mock(object):
             return super(Mock, self).__getattribute__(name)
         elif name in self._property_expectations:
             self._property_invocations.append(name)
-            return self._property_expectations[name].result
+            return self._property_expectations[name].get_result()
         elif name in self._sub_mocks:
             return self._sub_mocks[name]
         else:
@@ -45,4 +45,4 @@ class Mock(object):
         self._call_invocations.append((args, kwargs))
         for expectation in self._call_expectations:
             if expectation.args == args and expectation.kwargs == kwargs:
-                return expectation.result
+                return expectation.get_result()

@@ -1,9 +1,39 @@
 class Expectation(object):
-    def __init__(self, name, args, kwargs, result):
+    def __init__(self, name=None, args=None, kwargs=None, result=None):
         self.name = name
         self.args = args
         self.kwargs = kwargs
-        self.result = result
+        self.results = []
+        if result:
+            self.results.append(ValueResult(result))
+
+    def get_result(self):
+        return self.results[0].get_result()
+
+    def add_result(self, result):
+        self.results.append(result)
+
+
+class ValueResult(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        return isinstance(other, ValueResult) and self.value == other.value
+
+    def get_result(self):
+        return self.value
+
+
+class ErrorResult(object):
+    def __init__(self, exception):
+        self.exception = exception
+
+    def __eq__(self, other):
+        return isinstance(other, ErrorResult) and self.exception == other.exception
+
+    def get_result(self):
+        raise self.exception
 
 
 class ExpectationBuilder(object):
@@ -49,4 +79,10 @@ class ExpectationBuilder(object):
         if not self.match_criteria_defined:
             self.match_criteria_defined = True
             self.mock._add_property_expectation(self.expectation)
-        self.expectation.result = value
+        self.expectation.add_result(ValueResult(value))
+
+    def then_raise(self, exception):
+        if not self.match_criteria_defined:
+            self.match_criteria_defined = True
+            self.mock._add_property_expectation(self.expectation)
+        self.expectation.add_result(ErrorResult(exception))

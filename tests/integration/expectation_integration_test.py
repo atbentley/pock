@@ -1,6 +1,6 @@
 import pytest
 
-from pock.expectation import ExpectationBuilder, Expectation
+from pock.expectation import ExpectationBuilder, Expectation, ErrorResult
 from pock.mock import Mock
 
 
@@ -15,15 +15,28 @@ def method_name():
 
 
 @pytest.fixture
-def expectation_builder(mock):
-    """ :type mock: Mock """
-    return ExpectationBuilder(mock)
+def expectation():
+    return Expectation()
 
 
 @pytest.fixture
-def callable_expectation_builder(mock, method_name):
+def expectation_builder(mock, expectation):
     """ :type mock: Mock """
-    return ExpectationBuilder(mock, expectation=Expectation(method_name, None, None, None))
+    return ExpectationBuilder(mock, expectation=expectation)
+
+
+@pytest.fixture
+def callable_expectation_builder(expectation_builder, method_name):
+    """ :type expectation_builder: ExpectationBuilder """
+    getattr(expectation_builder, method_name)
+    return expectation_builder
+
+
+@pytest.fixture
+def result_ready_expectation_builder(callable_expectation_builder):
+    """ :type callable_expectation_builder: ExpectationBuilder """
+    callable_expectation_builder()
+    return callable_expectation_builder
 
 
 def test_first_attribute_access_defines_name(expectation_builder, method_name):
@@ -87,3 +100,17 @@ def test_defining_a_result_without_defining_match_criteria_will_create_a_propert
     expectation_builder.property.then_return(5)
 
     assert expectation_builder.expectation == mock._property_expectations[expectation_builder.expectation.name]
+
+
+def test_then_raise_adds_error_result_to_expectation(result_ready_expectation_builder, expectation):
+    """
+    :type result_ready_expectation_builder: ExpectationBuilder
+    :type expectation: Expectation
+    """
+    class CustomException(Exception):
+        pass
+
+    exception = CustomException()
+    result_ready_expectation_builder.then_raise(exception)
+
+    assert ErrorResult(exception) in expectation.results

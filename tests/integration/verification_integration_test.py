@@ -46,7 +46,7 @@ def test_accessing_a_property_returns_true_if_that_property_was_called(verificat
     :type verification_builder: VerificationBuilder
     :type mock: Mock
     """
-    mock._add_property_expectation(Expectation('property', None, None, None))
+    mock._add_property_expectation(Expectation('property', None, None, 1))
     mock.property
 
     assert verification_builder.property is True

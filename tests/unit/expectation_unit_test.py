@@ -1,6 +1,6 @@
 import pytest
 
-from pock.expectation import ExpectationBuilder
+from pock.expectation import ExpectationBuilder, Expectation, ErrorResult
 
 
 class FakeMock(object):
@@ -40,3 +40,12 @@ def test_expectation_builder_is_not_callable_after_match_criteria_recorded(calla
     callable_expectation_builder()
     with pytest.raises(TypeError):
         callable_expectation_builder()
+
+
+def test_error_result_raises_exception():
+    class CustomException(Exception):
+        pass
+    expectation = Expectation(None, None, None, None)
+    expectation.add_result(ErrorResult(CustomException))
+    with pytest.raises(CustomException):
+        expectation.get_result()
