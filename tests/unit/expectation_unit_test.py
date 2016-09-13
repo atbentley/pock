@@ -1,6 +1,6 @@
 import pytest
 
-from pock.expectation import ExpectationBuilder, Expectation, ErrorResult
+from pock.expectation import ExpectationBuilder, Expectation, ErrorResult, ValueResult
 
 
 class FakeMock(object):
@@ -28,6 +28,13 @@ def callable_expectation_builder(expectation_builder):
     return expectation_builder
 
 
+@pytest.fixture
+def result_ready_expectation_builder(callable_expectation_builder):
+    """ :type callable_expectation_builder: ExpectationBuilder """
+    callable_expectation_builder()
+    return callable_expectation_builder
+
+
 def test_subsequent_access_throws_error(expectation_builder):
     """ :type expectation_builder: ExpectationBuilder """
     getattr(expectation_builder, 'first_time_attribute_access')
@@ -42,6 +49,16 @@ def test_expectation_builder_is_not_callable_after_match_criteria_recorded(calla
         callable_expectation_builder()
 
 
+def test_then_return_passes_back_expectation_builder(result_ready_expectation_builder):
+    """ :type result_ready_expectation_builder: ExpectationBuilder """
+    assert result_ready_expectation_builder.then_return('something') == result_ready_expectation_builder
+
+
+def test_then_raise_passes_back_expectation_builder(result_ready_expectation_builder):
+    """ :type result_ready_expectation_builder: ExpectationBuilder """
+    assert result_ready_expectation_builder.then_raise(Exception) == result_ready_expectation_builder
+
+
 def test_error_result_raises_exception():
     class CustomException(Exception):
         pass
@@ -49,3 +66,12 @@ def test_error_result_raises_exception():
     expectation.add_result(ErrorResult(CustomException))
     with pytest.raises(CustomException):
         expectation.get_result()
+
+
+def test_get_result_rotates_through_expectations():
+    expectation = Expectation(None, None, None, None)
+    expectation.add_result(ValueResult('first'))
+    expectation.add_result(ValueResult('second'))
+    assert expectation.get_result() == 'first'
+    assert expectation.get_result() == 'second'
+    assert expectation.get_result() == 'second'

@@ -4,11 +4,15 @@ class Expectation(object):
         self.args = args
         self.kwargs = kwargs
         self.results = []
+        self.result_index = 0
         if result:
             self.results.append(ValueResult(result))
 
     def get_result(self):
-        return self.results[0].get_result()
+        result = self.results[self.result_index].get_result()
+        if self.result_index != len(self.results) - 1:
+            self.result_index += 1
+        return result
 
     def add_result(self, result):
         self.results.append(result)
@@ -80,9 +84,11 @@ class ExpectationBuilder(object):
             self.match_criteria_defined = True
             self.mock._add_property_expectation(self.expectation)
         self.expectation.add_result(ValueResult(value))
+        return self
 
     def then_raise(self, exception):
         if not self.match_criteria_defined:
             self.match_criteria_defined = True
             self.mock._add_property_expectation(self.expectation)
         self.expectation.add_result(ErrorResult(exception))
+        return self
