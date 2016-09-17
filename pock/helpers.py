@@ -1,3 +1,4 @@
+from .matchers import AnyValueMatcher
 from .expectation import ExpectationBuilder
 from .verification import VerificationBuilder
 from .mock import Mock
@@ -15,3 +16,6 @@ def when(mock):
 def verify(mock):
     """ :type mock: Mock """
     return VerificationBuilder(mock)
+
+
+any_value = AnyValueMatcher()

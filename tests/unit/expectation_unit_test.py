@@ -22,17 +22,17 @@ def expectation_builder(fake_mock):
 
 
 @pytest.fixture
-def callable_expectation_builder(expectation_builder):
+def match_ready_expectation_builder(expectation_builder):
     """ :type expectation_builder: ExpectationBuilder """
     getattr(expectation_builder, 'first_time_attribute_access')
     return expectation_builder
 
 
 @pytest.fixture
-def result_ready_expectation_builder(callable_expectation_builder):
-    """ :type callable_expectation_builder: ExpectationBuilder """
-    callable_expectation_builder()
-    return callable_expectation_builder
+def result_ready_expectation_builder(match_ready_expectation_builder):
+    """ :type match_ready_expectation_builder: ExpectationBuilder """
+    match_ready_expectation_builder()
+    return match_ready_expectation_builder
 
 
 def test_subsequent_access_throws_error(expectation_builder):
@@ -42,11 +42,11 @@ def test_subsequent_access_throws_error(expectation_builder):
         getattr(expectation_builder, 'subsequent_attribute_access')
 
 
-def test_expectation_builder_is_not_callable_after_match_criteria_recorded(callable_expectation_builder):
-    """ :type callable_expectation_builder: ExpectationBuilder """
-    callable_expectation_builder()
+def test_expectation_builder_is_not_callable_after_match_criteria_recorded(match_ready_expectation_builder):
+    """ :type match_ready_expectation_builder: ExpectationBuilder """
+    match_ready_expectation_builder()
     with pytest.raises(TypeError):
-        callable_expectation_builder()
+        match_ready_expectation_builder()
 
 
 def test_then_return_passes_back_expectation_builder(result_ready_expectation_builder):
@@ -62,14 +62,14 @@ def test_then_raise_passes_back_expectation_builder(result_ready_expectation_bui
 def test_error_result_raises_exception():
     class CustomException(Exception):
         pass
-    expectation = Expectation(None, None, None, None)
+    expectation = Expectation()
     expectation.add_result(ErrorResult(CustomException))
     with pytest.raises(CustomException):
         expectation.get_result()
 
 
 def test_get_result_rotates_through_expectations():
-    expectation = Expectation(None, None, None, None)
+    expectation = Expectation()
     expectation.add_result(ValueResult('first'))
     expectation.add_result(ValueResult('second'))
     assert expectation.get_result() == 'first'

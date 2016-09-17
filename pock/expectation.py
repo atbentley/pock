@@ -1,12 +1,14 @@
+from .matchers import MatchCriteria
+
+
 class Expectation(object):
-    def __init__(self, name=None, args=None, kwargs=None, result=None):
+    def __init__(self, name=None, match_criteria=None, result=None):
         self.name = name
-        self.args = args
-        self.kwargs = kwargs
+        self.match_criteria = match_criteria
         self.results = []
         self.result_index = 0
         if result:
-            self.results.append(ValueResult(result))
+            self.results.append(result)
 
     def get_result(self):
         result = self.results[self.result_index].get_result()
@@ -16,6 +18,13 @@ class Expectation(object):
 
     def add_result(self, result):
         self.results.append(result)
+
+    def set_match_criteria(self, match_criteria):
+        """ :type match_criteria: MatchCriteria """
+        self.match_criteria = match_criteria
+
+    def matches(self, args, kwargs):
+        return self.match_criteria.matches(args, kwargs)
 
 
 class ValueResult(object):
@@ -44,10 +53,10 @@ class ExpectationBuilder(object):
     def __init__(self, mock, expectation=None):
         """ :type expectation: Expectation """
         self.mock = mock
-        expectation = expectation or Expectation(None, None, None, None)
+        expectation = expectation or Expectation()
         self.expectation = expectation
         self.name_defined = expectation.name is not None
-        self.match_criteria_defined = expectation.args is not None
+        self.match_criteria_defined = expectation.match_criteria is not None
 
     def __getattribute__(self, name):
         name_has_been_defined = super(ExpectationBuilder, self).__getattribute__('name_defined')
@@ -75,8 +84,8 @@ class ExpectationBuilder(object):
         self.expectation.name = name
 
     def define_match_criteria(self, args, kwargs):
-        self.expectation.args = args
-        self.expectation.kwargs = kwargs
+        match_criteria = MatchCriteria(args, kwargs)
+        self.expectation.set_match_criteria(match_criteria)
         getattr(self.mock, self.expectation.name)._add_call_expectation(self.expectation)
 
     def then_return(self, value):

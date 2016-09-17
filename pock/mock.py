@@ -44,5 +44,5 @@ class Mock(object):
     def __call__(self, *args, **kwargs):
         self._call_invocations.append((args, kwargs))
         for expectation in self._call_expectations:
-            if expectation.args == args and expectation.kwargs == kwargs:
+            if expectation.matches(args, kwargs):
                 return expectation.get_result()
