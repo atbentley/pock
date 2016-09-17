@@ -36,10 +36,10 @@ class VerificationBuilder(object):
             match_criteria = MatchCriteria(args, kwargs)
             for called_args, called_kwargs in sub_mock._call_invocations:
                 if match_criteria.matches(called_args, called_kwargs):
-                    return True
+                    return called_args, called_kwargs
         elif (args, kwargs) in sub_mock._call_invocations:
             # All values are basic values, just compare to the invoked args and kwargs
-            return True
+            return args, kwargs
         else:
             params = []
             params.extend([str(arg) for arg in args])
