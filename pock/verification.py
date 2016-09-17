@@ -1,3 +1,6 @@
+from .matchers import Matcher, MatchCriteria
+
+
 class VerificationError(Exception):
     pass
 
@@ -26,7 +29,16 @@ class VerificationBuilder(object):
 
     def has_been_called_with(self, *args, **kwargs):
         sub_mock = getattr(self.mock, self.name)
-        if (args, kwargs) in sub_mock._call_invocations:
+        values = list(args)
+        values.extend(kwargs.values())
+        if any(isinstance(value, Matcher) for value in values):
+            # One of the values is a matcher so we need to construct a match criteria
+            match_criteria = MatchCriteria(args, kwargs)
+            for called_args, called_kwargs in sub_mock._call_invocations:
+                if match_criteria.matches(called_args, called_kwargs):
+                    return True
+        elif (args, kwargs) in sub_mock._call_invocations:
+            # All values are basic values, just compare to the invoked args and kwargs
             return True
         else:
             params = []
