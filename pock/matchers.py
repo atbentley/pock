@@ -52,6 +52,9 @@ class MatchCriteria(object):
 
         return self.arg_matchers == other.arg_matchers and self.kwarg_matchers == other.kwarg_matchers
 
+    def __hash__(self):
+        return hash(self.arg_matchers) + hash(self.kwarg_matchers)
+
     def matches(self, args, kwargs):
         if len(self.arg_matchers) != len(args) or set(self.kwarg_matchers.keys()) != set(kwargs.keys()):
             return False

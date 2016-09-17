@@ -11,7 +11,7 @@ overrides = (
 
 class Mock(object):
     def __init__(self):
-        self._call_expectations = []
+        self._call_expectations = {}
         self._property_expectations = {}
         self._call_invocations = []
         self._property_invocations = []
@@ -19,10 +19,7 @@ class Mock(object):
 
     def _add_call_expectation(self, expectation):
         """ :type expectation: Expectation """
-        for old_expectation in self._call_expectations:
-            if old_expectation.match_criteria == expectation.match_criteria:
-                self._call_expectations.remove(old_expectation)
-        self._call_expectations.append(expectation)
+        self._call_expectations[expectation.match_criteria] = expectation
 
     def _add_property_expectation(self, expectation):
         """ :type expectation: Expectation """
@@ -46,6 +43,6 @@ class Mock(object):
 
     def __call__(self, *args, **kwargs):
         self._call_invocations.append((args, kwargs))
-        for expectation in self._call_expectations:
+        for expectation in self._call_expectations.values():
             if expectation.matches(args, kwargs):
                 return expectation.get_result()
