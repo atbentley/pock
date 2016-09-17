@@ -19,6 +19,9 @@ class Mock(object):
 
     def _add_call_expectation(self, expectation):
         """ :type expectation: Expectation """
+        for old_expectation in self._call_expectations:
+            if old_expectation.match_criteria == expectation.match_criteria:
+                self._call_expectations.remove(old_expectation)
         self._call_expectations.append(expectation)
 
     def _add_property_expectation(self, expectation):

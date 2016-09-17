@@ -1,4 +1,7 @@
 class Matcher(object):
+    def __eq__(self, other):
+        raise NotImplemented
+
     def matches(self, value):
         raise NotImplemented
 
@@ -7,11 +10,20 @@ class ExactValueMatcher(Matcher):
     def __init__(self, value):
         self.value = value
 
+    def __eq__(self, other):
+        if not isinstance(other, ExactValueMatcher):
+            return False
+
+        return self.value == other.value
+
     def matches(self, value):
         return self.value == value
 
 
 class AnyValueMatcher(Matcher):
+    def __eq__(self, other):
+        return isinstance(other, AnyValueMatcher)
+
     def matches(self, value):
         return True
 
@@ -33,6 +45,12 @@ class MatchCriteria(object):
                 kwarg_matchers[key] = ExactValueMatcher(value)
         self.arg_matchers = arg_matchers
         self.kwarg_matchers = kwarg_matchers
+
+    def __eq__(self, other):
+        if not isinstance(other, MatchCriteria):
+            return False
+
+        return self.arg_matchers == other.arg_matchers and self.kwarg_matchers == other.kwarg_matchers
 
     def matches(self, args, kwargs):
         if len(self.arg_matchers) != len(args) or set(self.kwarg_matchers.keys()) != set(kwargs.keys()):
