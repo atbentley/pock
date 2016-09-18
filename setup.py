@@ -1,6 +1,6 @@
 import os
 import re
-from setuptools import setup as setup
+from setuptools import setup
 
 
 def read(path):
