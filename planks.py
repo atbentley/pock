@@ -34,17 +34,25 @@ def integration_tests():
 
 
 @task
+def functional_tests():
+    import pytest
+    exit_status = pytest.main(['tests/functional.py'])
+    if exit_status != 0:
+        raise Exception('Integration tests failed')
+
+
+@task
 def coverage():
     import coverage
     cov = coverage.coverage()
     cov.load()
     cov.combine(['.unit.coverage', '.integration.coverage'])
     cov.save()
-    cov.report()
+    cov.report(show_missing=True)
 
 
 @task
-@depends('unit_tests', 'integration_tests', 'coverage')
+@depends('unit_tests', 'integration_tests', 'functional_tests', 'coverage')
 def tests():
     pass
 

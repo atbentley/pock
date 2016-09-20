@@ -1,12 +1,50 @@
 import pytest
 
-from pock.expectation import Expectation, ValueResult, MatchCriteria
 from pock.mock import Mock, overrides
 
 
 @pytest.fixture
 def mock():
     return Mock()
+
+
+@pytest.fixture
+def expectation():
+    class MatchCriteriaStub(object):
+        pass
+
+    class ExpectationStub(object):
+        def __init__(self):
+            self.name = 'exceptional_expectation'
+            self.match_criteria = MatchCriteriaStub()
+
+        def matches(self, *args, **kwargs):
+            return True
+
+        def get_result(self):
+            return 587
+
+    return ExpectationStub()
+
+
+def test_add_call_expectation_adds_expectation(mock, expectation):
+    """
+    :type mock: Mock
+    :type expectation: Expectation
+    """
+    mock._add_call_expectation(expectation)
+
+    assert mock._call_expectations[expectation.match_criteria] == expectation
+
+
+def test_add_property_expectation_adds_expectation(mock, expectation):
+    """
+    :type mock: Mock
+    :type expectation: Expectation
+    """
+    mock._add_property_expectation(expectation)
+
+    assert mock._property_expectations[expectation.name] == expectation
 
 
 @pytest.mark.parametrize('param', overrides)
@@ -17,13 +55,27 @@ def test_getattribute_passes_through_overrides(mock, param):
 
 
 def test_getattribute_creates_sub_mock(mock):
+    """ :type mock: Mock """
     sub_mock = mock.something
 
     assert sub_mock != mock
     assert isinstance(sub_mock, Mock)
 
 
+def test_getattribute_adds_property_invocation(mock, expectation):
+    """
+    :type mock: Mock
+    :type expectation: Expectation
+    """
+    mock._add_property_expectation(expectation)
+
+    getattr(mock, expectation.name)
+
+    assert expectation.name in mock._property_invocations
+
+
 def test_getattribute_creates_different_sub_mocks(mock):
+    """ :type mock: Mock """
     some_sub_mock = mock.someting
     some_other_sub_mock = mock.something_else
 
@@ -31,22 +83,34 @@ def test_getattribute_creates_different_sub_mocks(mock):
 
 
 def test_getattribute_the_same_sub_mock_for_multiple_access(mock):
+    """ :type mock: Mock """
     first_sub_mock = mock.something
     second_sub_mock = mock.something
 
     assert first_sub_mock is second_sub_mock
 
 
-def test_call_returns_value_if_expectation_matches(mock):
-    expected_value = 'returned'
-    mock._add_call_expectation(Expectation(match_criteria=MatchCriteria((1,), {}), result=ValueResult(expected_value)))
+def test_getattribute_returns_self_when_accessing_call(mock):
+    """ :type mock: Mock """
+    sub_mock = mock.__call__
 
-    actual_value = mock(1)
-
-    assert actual_value == expected_value
+    assert sub_mock is mock
 
 
 def test_call_returns_none_if_no_expectations_match(mock):
-    actual_value = mock(1, 2)
+    """ :type mock: Mock """
+    assert mock(1, 2) is None
 
-    assert actual_value is None
+
+def test_call_adds_call_invocation(mock, expectation):
+    """
+    :type mock: Mock
+    :type expectation: Expectation
+    """
+    args = (1,)
+    kwargs = {'a': 1}
+    mock._add_call_expectation(expectation)
+
+    mock(*args, **kwargs)
+
+    assert (args, kwargs) in mock._call_invocations

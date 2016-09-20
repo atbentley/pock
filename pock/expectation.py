@@ -11,10 +11,10 @@ class Expectation(object):
             self.results.append(result)
 
     def get_result(self):
-        result = self.results[self.result_index].get_result()
+        result = self.results[self.result_index]
         if self.result_index != len(self.results) - 1:
             self.result_index += 1
-        return result
+        return result.get_result()
 
     def add_result(self, result):
         self.results.append(result)

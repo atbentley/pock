@@ -42,11 +42,10 @@ def test_subsequent_access_throws_error(expectation_builder):
         getattr(expectation_builder, 'subsequent_attribute_access')
 
 
-def test_expectation_builder_is_not_callable_after_match_criteria_recorded(match_ready_expectation_builder):
-    """ :type match_ready_expectation_builder: ExpectationBuilder """
-    match_ready_expectation_builder()
+def test_expectation_builder_is_not_callable_after_match_criteria_recorded(result_ready_expectation_builder):
+    """ :type result_ready_expectation_builder: ExpectationBuilder """
     with pytest.raises(TypeError):
-        match_ready_expectation_builder()
+        result_ready_expectation_builder()
 
 
 def test_then_return_passes_back_expectation_builder(result_ready_expectation_builder):

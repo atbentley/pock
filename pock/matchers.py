@@ -1,9 +1,15 @@
 class Matcher(object):
     def __eq__(self, other):
-        raise NotImplemented
+        raise NotImplementedError
+
+    def __ne__(self, other):
+        raise NotImplementedError
+
+    def __hash__(self):
+        raise NotImplementedError
 
     def matches(self, value):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class ExactValueMatcher(Matcher):
@@ -16,6 +22,12 @@ class ExactValueMatcher(Matcher):
 
         return self.value == other.value
 
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return hash(self.value)
+
     def matches(self, value):
         return self.value == value
 
@@ -23,6 +35,12 @@ class ExactValueMatcher(Matcher):
 class AnyValueMatcher(Matcher):
     def __eq__(self, other):
         return isinstance(other, AnyValueMatcher)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return 56789098765
 
     def matches(self, value):
         return True
@@ -51,6 +69,9 @@ class MatchCriteria(object):
             return False
 
         return self.arg_matchers == other.arg_matchers and self.kwarg_matchers == other.kwarg_matchers
+
+    def __ne__(self, other):
+        return not self == other
 
     def __hash__(self):
         return hash(tuple(self.arg_matchers)) + hash(tuple(sorted(self.kwarg_matchers.items())))
