@@ -58,6 +58,11 @@ def test_then_raise_passes_back_expectation_builder(result_ready_expectation_bui
     assert result_ready_expectation_builder.then_raise(Exception) == result_ready_expectation_builder
 
 
+def test_then_compute_passes_back_expectation_builder(result_ready_expectation_builder):
+    """ :type result_ready_expectation_builder: ExpectationBuilder """
+    assert result_ready_expectation_builder.then_compute(lambda *_, **__: None) == result_ready_expectation_builder
+
+
 def test_error_result_raises_exception():
     class CustomException(Exception):
         pass

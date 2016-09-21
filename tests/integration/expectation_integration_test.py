@@ -1,6 +1,6 @@
 import pytest
 
-from pock.expectation import ExpectationBuilder, Expectation, ErrorResult
+from pock.expectation import ExpectationBuilder, Expectation, ErrorResult, ComputationResult
 from pock.mock import Mock
 
 
@@ -103,4 +103,17 @@ def test_then_raise_adds_error_result_to_expectation(result_ready_expectation_bu
     result_ready_expectation_builder.then_raise(exception)
 
     assert ErrorResult(exception) in expectation.results
+
+
+def test_then_compute_adds_computation_result_to_expectation(result_ready_expectation_builder, expectation):
+    """
+    :type result_ready_expectation_builder: ExpectationBuilder
+    :type expectation: Expectation
+    """
+    def function(*args, **kwargs):
+        return None
+
+    result_ready_expectation_builder.then_compute(function)
+
+    assert ComputationResult(function) in expectation.results
 

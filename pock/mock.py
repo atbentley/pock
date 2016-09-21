@@ -45,4 +45,4 @@ class Mock(object):
         self._call_invocations.append((args, kwargs))
         for expectation in self._call_expectations.values():
             if expectation.matches(args, kwargs):
-                return expectation.get_result()
+                return expectation.get_result(args, kwargs)

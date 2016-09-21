@@ -10,11 +10,11 @@ class Expectation(object):
         if result:
             self.results.append(result)
 
-    def get_result(self):
+    def get_result(self, args=None, kwargs=None):
         result = self.results[self.result_index]
         if self.result_index != len(self.results) - 1:
             self.result_index += 1
-        return result.get_result()
+        return result.get_result(args or [], kwargs or {})
 
     def add_result(self, result):
         self.results.append(result)
@@ -34,7 +34,7 @@ class ValueResult(object):
     def __eq__(self, other):
         return isinstance(other, ValueResult) and self.value == other.value
 
-    def get_result(self):
+    def get_result(self, args, kwargs):
         return self.value
 
 
@@ -45,8 +45,19 @@ class ErrorResult(object):
     def __eq__(self, other):
         return isinstance(other, ErrorResult) and self.exception == other.exception
 
-    def get_result(self):
+    def get_result(self, args, kwargs):
         raise self.exception
+
+
+class ComputationResult(object):
+    def __init__(self, function):
+        self.function = function
+
+    def __eq__(self, other):
+        return isinstance(other, ComputationResult) and self.function == other.function
+
+    def get_result(self, args, kwargs):
+        return self.function(*args, **kwargs)
 
 
 class ExpectationBuilder(object):
@@ -89,15 +100,19 @@ class ExpectationBuilder(object):
         getattr(self.mock, self.expectation.name)._add_call_expectation(self.expectation)
 
     def then_return(self, value):
-        if not self.match_criteria_defined:
-            self.match_criteria_defined = True
-            self.mock._add_property_expectation(self.expectation)
-        self.expectation.add_result(ValueResult(value))
+        self._add_result(ValueResult(value))
         return self
 
     def then_raise(self, exception):
+        self._add_result(ErrorResult(exception))
+        return self
+
+    def then_compute(self, function):
+        self._add_result(ComputationResult(function))
+        return self
+
+    def _add_result(self, result):
         if not self.match_criteria_defined:
             self.match_criteria_defined = True
             self.mock._add_property_expectation(self.expectation)
-        self.expectation.add_result(ErrorResult(exception))
-        return self
+        self.expectation.add_result(result)

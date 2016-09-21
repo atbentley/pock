@@ -21,7 +21,7 @@ def expectation():
         def matches(self, *args, **kwargs):
             return True
 
-        def get_result(self):
+        def get_result(self, args=None, kwargs=None):
             return 587
 
     return ExpectationStub()
