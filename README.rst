@@ -1,6 +1,12 @@
 Pock
 ====
 
+.. image:: https://travis-ci.org/atbentley/pock.svg?branch=master
+  :target:  https://travis-ci.org/atbentley/pock
+
+.. image:: https://coveralls.io/repos/github/atbentley/pock/badge.svg?branch=master
+  :target: https://coveralls.io/github/atbentley/pock?branch=master
+
 Pock is a mocking framework for python. Pock supports:
 
 - Creating magic mocks
