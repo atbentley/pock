@@ -46,23 +46,72 @@ class AnyValueMatcher(Matcher):
         return True
 
 
+class AnyArgumentsMatcher(Matcher):
+    def __eq__(self, other):
+        return isinstance(other, AnyArgumentsMatcher)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return 874352841099
+
+    def matches(self, value):
+        return True
+
+
+class AnyKeywordArgumentsMatcher(Matcher):
+    def __eq__(self, other):
+        return isinstance(other, AnyKeywordArgumentsMatcher)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return 671834950902
+
+    def matches(self, value):
+        return True
+
+
+class AnyValuesMatcher(Matcher):
+    def __eq__(self, other):
+        return isinstance(other, AnyValuesMatcher)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return 32897482728
+
+    def matches(self, value):
+        return True
+
+
+def make_exact_value_matcher(arg_or_matcher):
+    if isinstance(arg_or_matcher, Matcher):
+        return arg_or_matcher
+    else:
+        return ExactValueMatcher(arg_or_matcher)
+
+
 class MatchCriteria(object):
     def __init__(self, args, kwargs):
-        arg_matchers = []
-        for arg in args:
-            if isinstance(arg, Matcher):
-                arg_matchers.append(arg)
-            else:
-                arg_matchers.append(ExactValueMatcher(arg))
+        self.arg_matchers = [make_exact_value_matcher(arg) for arg in args]
+        self.kwarg_matchers = dict(((key, make_exact_value_matcher(value)) for key, value in kwargs.items()))
 
-        kwarg_matchers = {}
-        for key, value in kwargs.items():
-            if isinstance(value, Matcher):
-                kwarg_matchers[key] = value
-            else:
-                kwarg_matchers[key] = ExactValueMatcher(value)
-        self.arg_matchers = arg_matchers
-        self.kwarg_matchers = kwarg_matchers
+        self.any_args = False
+        self.any_kwargs = False
+        self.any_values = False
+        while AnyArgumentsMatcher() in self.arg_matchers:
+            self.any_args = True
+            self.arg_matchers.remove(AnyArgumentsMatcher())
+        while AnyKeywordArgumentsMatcher() in self.arg_matchers:
+            self.any_kwargs = True
+            self.arg_matchers.remove(AnyKeywordArgumentsMatcher())
+        while AnyValuesMatcher() in self.arg_matchers:
+            self.any_values = True
+            self.arg_matchers.remove(AnyValuesMatcher())
 
     def __eq__(self, other):
         if not isinstance(other, MatchCriteria):
@@ -77,15 +126,24 @@ class MatchCriteria(object):
         return hash(tuple(self.arg_matchers)) + hash(tuple(sorted(self.kwarg_matchers.items())))
 
     def matches(self, args, kwargs):
-        if len(self.arg_matchers) != len(args) or set(self.kwarg_matchers.keys()) != set(kwargs.keys()):
+        arg_matchers = self.arg_matchers[:]
+        if self.any_args or self.any_values:
+            arg_matchers.extend([AnyArgumentsMatcher()] * (len(args) - len(arg_matchers)))
+
+        kwarg_matchers = self.kwarg_matchers
+        if self.any_kwargs or self.any_values:
+            kwarg_matchers = dict(((key, make_exact_value_matcher(value)) for key, value in kwargs.items()))
+            kwarg_matchers.update(self.kwarg_matchers)
+
+        if len(arg_matchers) != len(args) or set(kwarg_matchers.keys()) != set(kwargs.keys()):
             return False
 
-        for i in range(len(self.arg_matchers)):
-            if not self.arg_matchers[i].matches(args[i]):
+        for i in range(len(arg_matchers)):
+            if not arg_matchers[i].matches(args[i]):
                 return False
 
-        for key, kwarg_matcher in self.kwarg_matchers.items():
-            if not kwarg_matcher.matches(kwargs[key]):
+        for key, value in kwargs.items():
+            if not kwarg_matchers[key].matches(value):
                 return False
 
         return True

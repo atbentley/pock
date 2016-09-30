@@ -16,9 +16,7 @@ def get_version():
     return _version_re.findall(read(os.path.join('pock', '__init__.py')))[0]
 
 
-install_requires = read('requirements.txt').split('\n')
 test_requires = read('build-requirements.txt').split('\n')
-test_requires.extend(install_requires)
 
 setup(
     name='pock',
@@ -33,6 +31,5 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=install_requires,
     tests_require=test_requires
 )
