@@ -3,9 +3,9 @@ Pock
 
 Pock is a mocking framework for python. Pock supports:
 
- - Creating magic mocks
- - Defining the behaviour of mocks
- - Asserting on the access of mocks
+- Creating magic mocks
+- Defining the behaviour of mocks
+- Asserting on the access of mocks
 
 Pock does not make assumptions about which testing framework it's being run inside, so it'll work nicely with unittest, nosetest, pytest or whatever you choose to use.
 
