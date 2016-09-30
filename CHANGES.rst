@@ -7,6 +7,10 @@ Version 0.0.1
 
 unreleased
 
- - New feature: create basic mocks with the ``pock.mock`` helper.
- - New feature: create function, method and property expectations using the ``pock.when`` helper.
- - New feature: verify mock usage for function, method and property access using the ``pock.verify`` helper.
+Initial release, features include:
+
+ - Create magic mocks using the ``mock`` helper
+ - Create expectations on methods, properties and top-level functions using the ``when`` helper
+ - Assert access on methods, properties and top-level functions using the ``verify`` helper
+ - Match on arbitrary arguments using the ``any_value`` matcher
+ - Match on more complex arguments using a custom ``Matcher``
