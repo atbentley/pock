@@ -58,6 +58,12 @@ class Mock(object):
             self._sub_mocks[name] = sub_mock
             return sub_mock
 
+    def __enter__(self,):
+        return getattr(self, '__enter__')()
+
+    def __exit__(self, *args):
+        return getattr(self, '__exit__')(*args)
+
     def __getitem__(self, item):
         self._item_invocations.append(item)
         for expectation in self._item_expectations.values():
