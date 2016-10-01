@@ -1,11 +1,12 @@
 import pytest
 
 from pock.expectation import ExpectationBuilder, Expectation, ErrorResult, ValueResult
+from pock.matchers import MatchCriteria
 
 
 class FakeMock(object):
     def __getattribute__(self, name):
-        if name == '_add_call_expectation':
+        if name in ['_add_call_expectation', '_add_item_expectation']:
             return lambda _: None
         return self
 
@@ -46,6 +47,31 @@ def test_expectation_builder_is_not_callable_after_match_criteria_recorded(resul
     """ :type result_ready_expectation_builder: ExpectationBuilder """
     with pytest.raises(TypeError):
         result_ready_expectation_builder()
+
+
+def test_getitem_sets_name_to_getitem(expectation_builder):
+    """ :type expectation_builder: ExpectationBuilder """
+    expectation_builder[0]
+
+    assert expectation_builder.expectation.name == '__getitem__'
+
+
+def test_getitem_sets_match_criteria(expectation_builder):
+    """ :type expectation_builder: ExpectationBuilder """
+    expectation_builder[27]
+
+    assert expectation_builder.expectation.match_criteria == MatchCriteria(args=(27,), kwargs={})
+
+
+def test_getitem_passes_back_expectation_builer(expectation_builder):
+    """ :type expectation_builder: ExpectationBuilder """
+    assert expectation_builder[0] == expectation_builder
+
+
+def test_getitem_throws_error_after_name_has_been_defined(result_ready_expectation_builder):
+    """ :type result_ready_expectation_builder: ExpectationBuilder """
+    with pytest.raises(TypeError):
+        result_ready_expectation_builder[0]
 
 
 def test_then_return_passes_back_expectation_builder(result_ready_expectation_builder):

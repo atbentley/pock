@@ -20,6 +20,13 @@ class VerificationBuilder(object):
                 return self.has_been_called_with
         return super(VerificationBuilder, self).__getattribute__(name)
 
+    def __getitem__(self, item):
+        name_has_been_defined = super(VerificationBuilder, self).__getattribute__('name') is not None
+        if not name_has_been_defined:
+            self.name = '__getitem__'
+            return self.has_accessed_item(item)
+        return super(VerificationBuilder, self)[item]
+
     def __call__(self, *args, **kwargs):
         name_has_been_defined = super(VerificationBuilder, self).__getattribute__('name') is not None
         if not name_has_been_defined:
@@ -52,6 +59,17 @@ class VerificationBuilder(object):
         if self.name in self.mock._property_invocations:
             return True
         else:
-            msg = "Expected access to property '{property}', but no such access was made.".format(
-                property=self.name)
+            msg = "Expected access to property '{property}', but no such access was made.".format(property=self.name)
+            raise VerificationError(msg)
+
+    def has_accessed_item(self, item):
+        if isinstance(item, Matcher):
+            match_criteria = MatchCriteria((item,), {})
+            for called_item in self.mock._item_invocations:
+                if match_criteria.matches((called_item,), {}):
+                    return called_item
+        elif item in self.mock._item_invocations:
+            return item
+        else:
+            msg = "Expected access to item {item}, but no such access was made.".format(item=item)
             raise VerificationError(msg)

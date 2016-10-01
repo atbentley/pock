@@ -88,7 +88,17 @@ def test_defining_a_result_without_defining_match_criteria_will_create_a_propert
     """
     expectation_builder.property.then_return(5)
 
-    assert expectation_builder.expectation == mock._property_expectations[expectation_builder.expectation.name]
+    assert mock._property_expectations[expectation_builder.expectation.name] == expectation_builder.expectation
+
+
+def test_accessing_item_adds_item_expectation(expectation_builder, mock):
+    """
+    :type expectation_builder: ExpectationBuilder
+    :type mock: Mock
+    """
+    expectation_builder[0].then_return(1)
+
+    assert mock._item_expectations[expectation_builder.expectation.match_criteria] == expectation_builder.expectation
 
 
 def test_then_raise_adds_error_result_to_expectation(result_ready_expectation_builder, expectation):

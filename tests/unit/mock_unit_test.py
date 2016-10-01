@@ -1,5 +1,6 @@
 import pytest
 
+from pock.matchers import MatchCriteria
 from pock.mock import Mock, overrides
 
 
@@ -97,20 +98,42 @@ def test_getattribute_returns_self_when_accessing_call(mock):
     assert sub_mock is mock
 
 
-def test_call_returns_none_if_no_expectations_match(mock):
+def test_call_returns_mock_and_adds_expectation_if_no_expectations_match(mock):
     """ :type mock: Mock """
-    assert mock(1, 2) is None
+    new_mock = mock(1, 2)
+
+    assert isinstance(new_mock, Mock)
+    assert mock._call_expectations[MatchCriteria(args=(1,2), kwargs={})].get_result() == new_mock
 
 
-def test_call_adds_call_invocation(mock, expectation):
-    """
-    :type mock: Mock
-    :type expectation: Expectation
-    """
+def test_call_adds_call_invocation(mock):
+    """ :type mock: Mock """
     args = (1,)
     kwargs = {'a': 1}
-    mock._add_call_expectation(expectation)
 
     mock(*args, **kwargs)
 
     assert (args, kwargs) in mock._call_invocations
+
+
+def test_getitem_creates_different_sub_mock(mock):
+    """ :type mock: Mock """
+    some_sub_mock = mock[1]
+    some_other_sub_mock = mock['a']
+
+    assert some_sub_mock is not some_other_sub_mock
+
+
+def test_getitem_creates_same_sub_mock(mock):
+    """ :type mock: Mock """
+    some_sub_mock = mock[1]
+    some_other_sub_mock = mock[1]
+
+    assert some_sub_mock is some_other_sub_mock
+
+
+def test_getitem_adds_item_invocation(mock):
+    """ :type mock: Mock """
+    mock[1]
+
+    assert 1 in mock._item_invocations

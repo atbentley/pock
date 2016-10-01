@@ -91,13 +91,27 @@ class ExpectationBuilder(object):
 
         raise TypeError("'{name}' object is not callable".format(name=self.__class__.__name__))
 
+    def __getitem__(self, item):
+        name_has_been_defined = super(ExpectationBuilder, self).__getattribute__('name_defined')
+        if not name_has_been_defined:
+            self.name_defined = True
+            self.define_expectation_name('__getitem__')
+            self.match_criteria_defined = True
+            self.define_match_criteria((item,), {})
+            return self
+
+        raise TypeError("'{name}' object has no attribute __getitem__".format(name=self.__class__.__name__))
+
     def define_expectation_name(self, name):
         self.expectation.name = name
 
     def define_match_criteria(self, args, kwargs):
         match_criteria = MatchCriteria(args, kwargs)
         self.expectation.set_match_criteria(match_criteria)
-        getattr(self.mock, self.expectation.name)._add_call_expectation(self.expectation)
+        if self.expectation.name == '__getitem__':
+            self.mock._add_item_expectation(self.expectation)
+        else:
+            getattr(self.mock, self.expectation.name)._add_call_expectation(self.expectation)
 
     def then_return(self, value):
         self._add_result(ValueResult(value))
