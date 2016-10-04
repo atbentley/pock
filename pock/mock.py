@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from .expectation import ValueResult, Expectation
 from .matchers import MatchCriteria
 
@@ -21,14 +23,14 @@ overrides = (
 
 class Mock(object):
     def __init__(self):
-        self._call_expectations = {}
-        self._property_expectations = {}
-        self._item_expectations = {}
+        self._call_expectations = OrderedDict()
+        self._property_expectations = OrderedDict()
+        self._item_expectations = OrderedDict()
         self._call_invocations = []
         self._property_invocations = []
         self._item_invocations = []
-        self._sub_mocks = {}
-        self._item_mocks = {}
+        self._sub_mocks = OrderedDict()
+        self._item_mocks = OrderedDict()
 
     def _add_call_expectation(self, expectation):
         """ :type expectation: Expectation """
