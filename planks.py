@@ -6,7 +6,7 @@ from plank import task, depends
 @task
 def install_requirements():
     import pip
-    pip.main(['install', '--upgrade', '-r', 'requirements.txt', '-r', 'build-requirements.txt'])
+    pip.main(['install', '--upgrade', '-r', 'build-requirements.txt'])
 
 
 @task
