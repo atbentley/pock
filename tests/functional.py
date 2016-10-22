@@ -1,5 +1,6 @@
 import pytest
 
+from pock import any_values
 from pock import mock, when, verify, any_value, VerificationError
 
 
@@ -57,3 +58,17 @@ def test_chaining_results():
         chained_mock.something()
     assert chained_mock.something() == 2
     assert chained_mock.something() == 2
+
+
+def test_failed_verification():
+    some_mock = mock()
+    with pytest.raises(VerificationError):
+        verify(some_mock).some_method()
+    with pytest.raises(VerificationError):
+        verify(some_mock).some_method(any_values)
+    with pytest.raises(VerificationError):
+        verify(some_mock).some_method(1)
+    with pytest.raises(VerificationError):
+        verify(some_mock)[1]
+    with pytest.raises(VerificationError):
+        verify(some_mock)[any_values]

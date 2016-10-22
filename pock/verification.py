@@ -47,13 +47,13 @@ class VerificationBuilder(object):
         elif (args, kwargs) in sub_mock._call_invocations:
             # All values are basic values, just compare to the invoked args and kwargs
             return args, kwargs
-        else:
-            params = []
-            params.extend([str(arg) for arg in args])
-            params.extend(['{0}={1}'.format(str(item[0]), str(item[1])) for item in kwargs.items()])
-            msg = "Expected call to {method}({params}), but no such call was made.".format(
-                method=self.name, params=', '.join(params))
-            raise VerificationError(msg)
+
+        params = []
+        params.extend([str(arg) for arg in args])
+        params.extend(['{0}={1}'.format(str(item[0]), str(item[1])) for item in kwargs.items()])
+        msg = "Expected call to {method}({params}), but no such call was made.".format(
+            method=self.name, params=', '.join(params))
+        raise VerificationError(msg)
 
     def has_accessed_property(self):
         if self.name in self.mock._property_invocations:
@@ -70,6 +70,6 @@ class VerificationBuilder(object):
                     return called_item
         elif item in self.mock._item_invocations:
             return item
-        else:
-            msg = "Expected access to item {item}, but no such access was made.".format(item=item)
-            raise VerificationError(msg)
+
+        msg = "Expected access to item {item}, but no such access was made.".format(item=item)
+        raise VerificationError(msg)
