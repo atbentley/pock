@@ -18,12 +18,10 @@ def context_manager(returning=None):
 
 
 def when(mock):
-    """ :type mock: Mock """
     return ExpectationBuilder(mock)
 
 
 def verify(mock):
-    """ :type mock: Mock """
     return VerificationBuilder(mock)
 
 
