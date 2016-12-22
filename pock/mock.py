@@ -73,9 +73,10 @@ class Mock(object):
                 return expectation.get_result((item,), {})
 
         new_mock = Mock()
-        new_expectation = Expectation(name='__getitem__',
-                                      match_criteria=MatchCriteria(args=(item, ), kwargs={}),
-                                      result=ValueResult(new_mock))
+        new_expectation = Expectation(
+            name='__getitem__',
+            match_criteria=MatchCriteria(args=(item, ), kwargs={}),
+            result=ValueResult(new_mock))
         self._add_item_expectation(new_expectation)
         return new_mock
 
@@ -86,9 +87,10 @@ class Mock(object):
                 return expectation.get_result(args, kwargs)
 
         new_mock = Mock()
-        new_expectation = Expectation(name='__call__',
-                                      match_criteria=MatchCriteria(args=args, kwargs=kwargs),
-                                      result=ValueResult(new_mock))
+        new_expectation = Expectation(
+            name='__call__',
+            match_criteria=MatchCriteria(args=args, kwargs=kwargs),
+            result=ValueResult(new_mock))
         self._add_call_expectation(new_expectation)
         return new_mock
 
