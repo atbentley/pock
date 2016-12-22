@@ -40,7 +40,7 @@ class AnyValueMatcher(Matcher):
         return not self == other
 
     def __hash__(self):
-        return 56789098765
+        return hash(AnyValueMatcher)
 
     def matches(self, value):
         return True
@@ -54,7 +54,7 @@ class AnyArgumentsMatcher(Matcher):
         return not self == other
 
     def __hash__(self):
-        return 874352841099
+        return hash(AnyArgumentsMatcher)
 
     def matches(self, value):
         return True
@@ -68,7 +68,7 @@ class AnyKeywordArgumentsMatcher(Matcher):
         return not self == other
 
     def __hash__(self):
-        return 671834950902
+        return hash(AnyKeywordArgumentsMatcher)
 
     def matches(self, value):
         return True
@@ -82,7 +82,7 @@ class AnyValuesMatcher(Matcher):
         return not self == other
 
     def __hash__(self):
-        return 32897482728
+        return hash(AnyValuesMatcher)
 
     def matches(self, value):
         return True
