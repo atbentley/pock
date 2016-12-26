@@ -21,6 +21,10 @@ def when(mock):
     return ExpectationBuilder(mock)
 
 
+def when_async(mock):
+    return ExpectationBuilder(mock, async=True)
+
+
 def verify(mock):
     return VerificationBuilder(mock)
 

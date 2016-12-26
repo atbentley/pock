@@ -1,4 +1,11 @@
+from functools import partial
+
 from .matchers import MatchCriteria
+
+try:
+    import asyncio
+except ImportError:
+    asyncio = None
 
 
 class Expectation(object):
@@ -27,43 +34,63 @@ class Expectation(object):
         return self.match_criteria.matches(args, kwargs)
 
 
-class ValueResult(object):
-    def __init__(self, value):
+class Result(object):
+    def __init__(self, async=False):
+        self.async = async
+
+    def _get_result(self, args, kwargs):
+        raise NotImplementedError()
+
+    def get_result(self, args, kwargs):
+        if self.async:
+            return asyncio.coroutine(partial(self._get_result, args, kwargs))()
+        else:
+            return self._get_result(args, kwargs)
+
+
+class ValueResult(Result):
+    def __init__(self, value, async=False):
+        super(ValueResult, self).__init__(async)
         self.value = value
 
     def __eq__(self, other):
         return isinstance(other, ValueResult) and self.value == other.value
 
-    def get_result(self, args, kwargs):
+    def _get_result(self, args, kwargs):
         return self.value
 
 
-class ErrorResult(object):
-    def __init__(self, exception):
+class ErrorResult(Result):
+    def __init__(self, exception, async=False):
+        super(ErrorResult, self).__init__(async)
         self.exception = exception
 
     def __eq__(self, other):
         return isinstance(other, ErrorResult) and self.exception == other.exception
 
-    def get_result(self, args, kwargs):
+    def _get_result(self, args, kwargs):
         raise self.exception
 
 
-class ComputationResult(object):
-    def __init__(self, function):
+class ComputationResult(Result):
+    def __init__(self, function, async=False):
+        super(ComputationResult, self).__init__(async)
         self.function = function
 
     def __eq__(self, other):
         return isinstance(other, ComputationResult) and self.function == other.function
 
-    def get_result(self, args, kwargs):
+    def _get_result(self, args, kwargs):
         return self.function(*args, **kwargs)
 
 
 class ExpectationBuilder(object):
-    def __init__(self, mock, expectation=None):
+    def __init__(self, mock, expectation=None, async=False):
         """ :type expectation: Expectation """
+        if async and not asyncio:
+            raise RuntimeError('Can only use async feature with Python 3.5+')
         self.mock = mock
+        self.async = async
         expectation = expectation or Expectation()
         self.expectation = expectation
         self.name_defined = expectation.name is not None
@@ -114,15 +141,15 @@ class ExpectationBuilder(object):
             getattr(self.mock, self.expectation.name)._add_call_expectation(self.expectation)
 
     def then_return(self, value):
-        self._add_result(ValueResult(value))
+        self._add_result(ValueResult(value, async=self.async))
         return self
 
     def then_raise(self, exception):
-        self._add_result(ErrorResult(exception))
+        self._add_result(ErrorResult(exception, async=self.async))
         return self
 
     def then_compute(self, function):
-        self._add_result(ComputationResult(function))
+        self._add_result(ComputationResult(function, async=self.async))
         return self
 
     def _add_result(self, result):

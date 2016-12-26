@@ -16,6 +16,7 @@ Pock is a mocking framework for python. Pock supports:
 Pock does not make assumptions about which testing framework it's being run inside, so it'll work nicely with unittest, nosetest, pytest or whatever you choose to use.
 
 
+
 Installation
 ------------
 
@@ -91,6 +92,15 @@ Mocking top level functions:
   when(function_mock)('c').then_return(3)
   function_mock('c')  # 3
   verify(fuction_mock)('c')  # True
+
+
+Mocking asyncio coroutines, futures or awaitables
+
+.. code-block:: python
+
+  async_mock = mock()
+  when_async(mock).something().then_return(7)
+  await async_mock.something()  # 7
 
 
 Testing
