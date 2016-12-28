@@ -20,15 +20,9 @@ def context_manager(returning=None):
         returning = context_manager_mock
     when(context_manager_mock).__enter__().then_return(returning)
     when(context_manager_mock).__exit__(any_values).then_return(None)
-    return context_manager_mock
-
-
-def async_context_manager(returning=None):
-    context_manager_mock = mock()
-    if returning is None:
-        returning = context_manager_mock
-    when_async(context_manager_mock).__aenter__().then_return(returning)
-    when_async(context_manager_mock).__aexit__(any_values).then_return(None)
+    if asyncio:
+        when_async(context_manager_mock).__aenter__().then_return(returning)
+        when_async(context_manager_mock).__aexit__(any_values).then_return(None)
     return context_manager_mock
 
 
