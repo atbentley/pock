@@ -61,4 +61,4 @@ target/
 # Editors
 .idea/
 *.DS_Store
-.vscode
+.vscodedocs/_build
