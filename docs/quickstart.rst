@@ -65,12 +65,12 @@ For example, consider the case of a user service which fetches information about
           return User(name, email)
 
 
-Since get_user_from_email has a dependency on the database, if we wanted to write a unit test for get_user_from_email we would need to replace the real database with a mocked database that returns the same format of data that a real database would, but in a more deterministic way.
+Since ``get_user_from_email`` has a dependency on the database, if we wanted to write a unit test for ``get_user_from_email`` we would need to replace the real database with a mocked database that returns the same format of data that a real database would, but in a more deterministic way.
 
 Your first test
 ---------------
 
-Lets actually write some unit tests for the above user service's get_user_from_email method. A standard unit test for this method might check to see that `get_user_from_email` pulls all the right details out of the database response:
+Lets actually write some unit tests for the above user service's get_user_from_email method. A standard unit test for this method might check to see that ``get_user_from_email`` pulls all the right details out of the database response:
 
 .. code-block:: python
 
@@ -101,15 +101,3 @@ And a unit test to check the sad path for this method could look like this:
       with pytest.raises(UserNotFound):
           user_service.get_user_from_email('andrew@example.com')
       verify(database).select(any_values)
-
-
-Concepts
---------
-
-Two main concepts exist in Pock, expectations and verifications. Expectations allow the behaviour of a mock to be defined and verification allows a mock to be inspected post test to see what interactions occurred on it.
-
-Expectations can be created for methods, functions, properties and items. Expectations can return constant values, computed values and raise exceptions. See building expectations for more.
-
-When creating expectations on methods, functions or items the arguments can be specified to match exactly or according to some criteria. See argument matching for more.
-
-Verification can be performed on methods, functions, properties and items just the same as expectations and argument matching also works in a similar manner. See verifying interactions for more.

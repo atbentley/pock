@@ -1,7 +1,7 @@
 Installation
 ============
 
-The recommended way to get Pock is to use `pip` and install the latest stable release in a `virtualenv`::
+The recommended way to get Pock is to use ``pip`` and install the latest stable release in a virtualenv::
 
     pip install pock
 

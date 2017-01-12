@@ -1,6 +1,7 @@
 import os
-
+import sys
 import time
+
 from plank import task, depends
 
 
@@ -109,13 +110,15 @@ def docs_watch():
 @task
 def docs_serve():
     import threading
-    from http.server import test as serve, SimpleHTTPRequestHandler
+    try:
+        from http.server import test as serve, SimpleHTTPRequestHandler
+    except ImportError:
+        from SimpleHTTPServer import test as serve, SimpleHTTPRequestHandler
+        sys.argv = ['']
 
     os.chdir('docs/_build/html')
     server = threading.Thread(target=serve, kwargs={'HandlerClass': SimpleHTTPRequestHandler})
-    server.start()
-    while True:
-        time.sleep(1)
+    server.run()
 
 
 @task

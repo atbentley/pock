@@ -30,27 +30,24 @@ Matches any positional argument or keyword argument depending on where it is use
 
   when(my_mock).a_method('first', any_value).then_return(1)
   my_mock.a_method('first', 'python')  # 1
-  my_mock.a_method('second', None)  # None
+  my_mock.a_method('second', None)  # not matched
 
   when(my_mock).b_method('first', season=any_value).then_return(2)
   my_mock.b_method('first', season='winter')  # 2
-  my_mock.b_method('first')  # None
+  my_mock.b_method('first')  # not matched
 
 
 any_args
 ^^^^^^^^
 
-Matches all positional arguments, regardless of how many there are.
+Matches any positional arguments sent in, regardless of how many there are
 
 .. code-block:: python
 
-  when(my_mock).a_method('first', any_value).then_return(1)
-  my_mock.a_method('first', 'python')  # 1
-  my_mock.a_method('second', None)  # None
-
-  when(my_mock).b_method('first', season=any_value).then_return(2)
-  my_mock.b_method('first', season='winter')  # 2
-  my_mock.b_method('first')  # None
+  when(my_mock).method(any_args).then_return(True)
+  my_mock.method('a', 'b')  # True
+  my_mock.method()  # True
+  my_mock.method('a', b='b')  # not matched
 
 
 any_kwargs
@@ -58,15 +55,30 @@ any_kwargs
 
 Matches all keyword arguments, regardless of how many there are, what their keys are and what their values.
 
+.. code-block:: python
+
+  when(my_mock).method(any_kwargs).then_return(True)
+  my_mock.method(this='that')  # True
+  my_mock.method()  # True
+  my_mock.method(1)  # not matched
+
+
 any_values
 ^^^^^^^^^^
 
 Effectively a combination of any_args and any_kwargs.
 
+.. code-block:: python
+
+  when(my_mock).method(any_values).then_return(True)
+  my_mock.method('put', anything='and everything')  # True
+  my_mock.method()  # True
+
+
 ExactValueMatcher
 ^^^^^^^^^^^^^^^^^
 
-Matches a value exactly, any values used when building behaviours of verifying interactions that aren't matchers are converted into ExactValueMatcher's behind the scenes.
+The ``ExactValueMatcher`` matches a value exactly. When building behaviours or verifying interactions and passing in a value that is not matcher, Pock will convert that value into an ``ExactValueMatcher`` internally.
 
 .. code-block:: python
 
@@ -78,11 +90,12 @@ Matches a value exactly, any values used when building behaviours of verifying i
 Custom matchers
 ---------------
 
-In order for Pock to efficiently determine whether a set of given arguments match a given set of matches, the magic methods __eq__, __ne__ and __hash__ should be implemented according to the following two principals:
+In order for Pock to efficiently determine whether a set of given arguments match a given set of matches, the magic methods ``__eq__``, ``__ne__`` and ``__hash__`` should be implemented according to the following two principals:
 
 1. Two matchers are equal when they always match for the same set of values and also fail to match for the same set of values.
 2. If two matchers are equal they should have the same hash
 
+See Python's documentation on `Special method names <https://docs.python.org/3/reference/datamodel.html#special-method-names>`_ for more info on these magic methods.
 
 Simple matchers
 ^^^^^^^^^^^^^^^
@@ -111,14 +124,14 @@ Here is an example of matcher that only matches even numbers.
   even = EvenMatcher()
   when(number_service_mock).is_good_number(even).then_return(True)
 
-For the EvenMatcher, __eq__ is implemented to return True when compared to any other EvenMatcher since they'll always match for the same values.
+For the ``EvenMatcher``, ``__eq__`` is implemented to return True when compared to any other EvenMatcher since they'll always match for the same values.
 
-Because all EvenMatcher's are equal to each other, the hash value is taken from the hash value of the class.
+Because all ``EvenMatcher`` s are equal to each other, the hash value is taken from the hash value of the class.
 
 Parametrised matchers
 ^^^^^^^^^^^^^^^^^^^^^
 
-A more complicated matcher is one that can take parameters, consider a matcher that matches any number if it is divisible by n.
+A more complicated matcher is one that can take parameters, consider a matcher that matches any number if it is divisible by ``n``.
 
 .. code-block:: python
 
@@ -148,4 +161,4 @@ A more complicated matcher is one that can take parameters, consider a matcher t
   divisible_by_7 = DivisibleByN(7)
   when(lucky).is_lucky(divisible_by_7).then_return(True)
 
-Here the DivisibleByN matcher needs to also compare the value of n in __eq__ and __ne__ and likewise, the value of n is included in the hash function.
+Here the ``DivisibleByN`` matcher needs to also compare the value of ``n`` in ``__eq__`` and ``__ne__`` and likewise, the value of ``n`` is included in the hash function. This ensures that all ``DivisibleByN`` matchers of the same ``n`` are equal by comparison and hash but matchers with different ``n`` are not.
