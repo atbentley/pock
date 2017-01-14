@@ -10,6 +10,11 @@ def mock():
 
 
 @pytest.fixture
+def strict_mock():
+    return Mock(strict=True)
+
+
+@pytest.fixture
 def behaviour():
     class MatchCriteriaStub(object):
         pass
@@ -98,6 +103,12 @@ def test_getattribute_returns_self_when_accessing_call(mock):
     assert sub_mock is mock
 
 
+def test_getattribute_raises_attribute_error_when_strict(strict_mock):
+    """ :type strict_mock: Mock """
+    with pytest.raises(AttributeError):
+        strict_mock.nope()
+
+
 def test_call_returns_mock_and_adds_behaviour_if_no_behaviours_match(mock):
     """ :type mock: Mock """
     new_mock = mock(1, 2)
@@ -114,6 +125,12 @@ def test_call_adds_call_invocation(mock):
     mock(*args, **kwargs)
 
     assert (args, kwargs) in mock._call_invocations
+
+
+def test_call_raises_type_error_when_strict(strict_mock):
+    """ :type strict_mock: Mock """
+    with pytest.raises(TypeError):
+        strict_mock()
 
 
 def test_getitem_creates_different_sub_mock(mock):
@@ -137,3 +154,9 @@ def test_getitem_adds_item_invocation(mock):
     mock[1]
 
     assert 1 in mock._item_invocations
+
+
+def test_getitem_raises_type_error_when_strict(strict_mock):
+    """ :type strict_mock: Mock """
+    with pytest.raises(TypeError):
+        strict_mock['nope']

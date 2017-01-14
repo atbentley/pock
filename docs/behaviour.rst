@@ -72,3 +72,8 @@ Results can be chained up just by specifying more than one result. When a mock i
   my_mock.bind()  # True
   my_mock.bind()  # Exception
   my_mock.bind()  # Exception
+
+Asyncio
+^^^^^^^
+
+See :ref:`asyncio` for notes on how to return asyncio coroutines and futures.

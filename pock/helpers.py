@@ -14,6 +14,10 @@ def mock():
     return Mock()
 
 
+def strict_mock():
+    return Mock(strict=True)
+
+
 def context_manager(returning=None):
     context_manager_mock = Mock()
     if returning is None:

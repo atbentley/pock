@@ -6,7 +6,7 @@ from pock.matchers import MatchCriteria
 
 class FakeMock(object):
     def __getattribute__(self, name):
-        if name in ['_add_call_behaviour', '_add_item_behaviour']:
+        if name in ['_add_call_behaviour', '_add_item_behaviour', '_add_method_behaviour']:
             return lambda _: None
         return self
 

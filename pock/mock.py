@@ -3,10 +3,12 @@ from collections import OrderedDict
 from .behaviour import ValueResult, Behaviour
 from .matchers import MatchCriteria
 
+
 overrides = (
     '_add_call_behaviour',
     '_add_property_behaviour',
     '_add_item_behaviour',
+    '_add_method_behaviour',
     '_call_behaviours',
     '_property_behaviours',
     '_item_behaviours',
@@ -14,6 +16,7 @@ overrides = (
     '_property_invocations',
     '_item_invocations',
     '_sub_mocks',
+    '_strict',
     '__iter__',
     '__repr__',
     '__str__',
@@ -22,7 +25,7 @@ overrides = (
 
 
 class Mock(object):
-    def __init__(self):
+    def __init__(self, strict=False):
         self._call_behaviours = OrderedDict()
         self._property_behaviours = OrderedDict()
         self._item_behaviours = OrderedDict()
@@ -31,18 +34,25 @@ class Mock(object):
         self._item_invocations = []
         self._sub_mocks = OrderedDict()
         self._item_mocks = OrderedDict()
+        self._strict = strict
 
     def _add_call_behaviour(self, behaviour):
-        """ :type behaviour: Behaviour """
         self._call_behaviours[behaviour.match_criteria] = behaviour
 
     def _add_property_behaviour(self, behaviour):
-        """ :type behaviour: Behaviour """
         self._property_behaviours[behaviour.name] = behaviour
 
     def _add_item_behaviour(self, behaviour):
-        """ :type behaviour: Behaviour """
         self._item_behaviours[behaviour.match_criteria] = behaviour
+
+    def _add_method_behaviour(self, behaviour):
+        if behaviour.name not in self._sub_mocks:
+            if behaviour.name == '__call__':
+                sub_mock = self
+            else:
+                sub_mock = Mock(strict=self._strict)
+            self._sub_mocks[behaviour.name] = sub_mock
+        self._sub_mocks[behaviour.name]._add_call_behaviour(behaviour)
 
     def __getattribute__(self, name):
         if name in overrides:
@@ -53,12 +63,15 @@ class Mock(object):
         elif name in self._sub_mocks:
             return self._sub_mocks[name]
         else:
-            if name == '__call__':
-                sub_mock = self
+            if self._strict:
+                return super(Mock, self).__getattribute__(name)
             else:
-                sub_mock = Mock()
-            self._sub_mocks[name] = sub_mock
-            return sub_mock
+                if name == '__call__':
+                    sub_mock = self
+                else:
+                    sub_mock = Mock()
+                self._sub_mocks[name] = sub_mock
+                return sub_mock
 
     def __enter__(self,):
         return getattr(self, '__enter__')()
@@ -72,13 +85,16 @@ class Mock(object):
             if behaviour.matches((item,), {}):
                 return behaviour.get_result((item,), {})
 
-        new_mock = Mock()
-        new_behaviour = Behaviour(
-            name='__getitem__',
-            match_criteria=MatchCriteria(args=(item, ), kwargs={}),
-            result=ValueResult(new_mock))
-        self._add_item_behaviour(new_behaviour)
-        return new_mock
+        if self._strict:
+            raise TypeError("'Mock' object has no attribute '__getitem__'")
+        else:
+            new_mock = Mock()
+            new_behaviour = Behaviour(
+                name='__getitem__',
+                match_criteria=MatchCriteria(args=(item, ), kwargs={}),
+                result=ValueResult(new_mock))
+            self._add_item_behaviour(new_behaviour)
+            return new_mock
 
     def __call__(self, *args, **kwargs):
         self._call_invocations.append((args, kwargs))
@@ -86,13 +102,17 @@ class Mock(object):
             if behaviour.matches(args, kwargs):
                 return behaviour.get_result(args, kwargs)
 
-        new_mock = Mock()
-        new_behaviour = Behaviour(
-            name='__call__',
-            match_criteria=MatchCriteria(args=args, kwargs=kwargs),
-            result=ValueResult(new_mock))
-        self._add_call_behaviour(new_behaviour)
-        return new_mock
+        if self._strict:
+            raise TypeError("'Mock' object is not callable")
+
+        else:
+            new_mock = Mock()
+            new_behaviour = Behaviour(
+                name='__call__',
+                match_criteria=MatchCriteria(args=args, kwargs=kwargs),
+                result=ValueResult(new_mock))
+            self._add_call_behaviour(new_behaviour)
+            return new_mock
 
     def __iter__(self):
         raise NotImplementedError()

@@ -135,7 +135,7 @@ class BehaviourBuilder(object):
         if self.behaviour.name == '__getitem__':
             self.mock._add_item_behaviour(self.behaviour)
         else:
-            getattr(self.mock, self.behaviour.name)._add_call_behaviour(self.behaviour)
+            self.mock._add_method_behaviour(self.behaviour)
 
     def then_return(self, value):
         self._add_result(ValueResult(value))

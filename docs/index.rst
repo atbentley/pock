@@ -1,7 +1,7 @@
 Welcome to Pock
 ===============
 
-Pock is a mocking framework for Python that makes creating complex test behaviour a breeze.
+*Pock is a mocking framework for Python that makes creating complex test behaviour a breeze.*
 
 Pock provides an interface for creating and verifying mock behaviour that is natural and easy to read, no matter what the access method is, method, function call, property or item access.
 
@@ -27,7 +27,7 @@ Pock provides an interface for creating and verifying mock behaviour that is nat
   verify(my_mock).port
 
 
-Some select features of Pock are:
+Some of Pock's features include:
 
 - Mock and verify a range of access patterns in Python
 - Match arguments during mock creation and verification
@@ -47,6 +47,7 @@ To learn more, choose a topic from the navigation on the left or dive right into
   behaviour
   verify
   matching
+  mocks
   higher
   asyncio
   changelog
