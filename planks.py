@@ -72,11 +72,15 @@ def build():
     pass
 
 
+def build_docs():
+    import sphinx
+    sphinx.main(['', '-c', 'docs', '-b', 'html', 'docs', 'docs/_build/html'])
+
+
 @task
 def docs():
-    import sphinx
     print('See docs/_build for compiled documentation')
-    sphinx.main(['', '-c', 'docs', '-b', 'html', 'docs', 'docs/_build/html'])
+    build_docs()
 
 
 @task
@@ -92,7 +96,7 @@ def docs_watch():
         def on_any_event(self, event):
             self.observer.stop()
             try:
-                sphinx.main(['', '-c', 'docs', '-b', 'html', 'docs', 'docs/_build/html'])
+                build_docs()
             finally:
                 watch()
 
@@ -124,6 +128,11 @@ def docs_serve():
 @task
 def docs_dev():
     from multiprocessing import Process
+
+    try:
+        build_docs()
+    except SystemExit:
+        pass
 
     builder = Process(target=docs_watch.run)
     server = Process(target=docs_serve.run)
