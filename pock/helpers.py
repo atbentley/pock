@@ -21,17 +21,13 @@ def context_manager(returning=None):
     when(context_manager_mock).__enter__().then_return(returning)
     when(context_manager_mock).__exit__(any_values).then_return(None)
     if asyncio:
-        when_async(context_manager_mock).__aenter__().then_return(returning)
-        when_async(context_manager_mock).__aexit__(any_values).then_return(None)
+        when(context_manager_mock).__aenter__().then_return_future(returning)
+        when(context_manager_mock).__aexit__(any_values).then_return_future(None)
     return context_manager_mock
 
 
 def when(mock):
     return BehaviourBuilder(mock)
-
-
-def when_async(mock):
-    return BehaviourBuilder(mock, async=True)
 
 
 def verify(mock):

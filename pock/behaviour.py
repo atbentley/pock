@@ -27,7 +27,6 @@ class Behaviour(object):
         self.results.append(result)
 
     def set_match_criteria(self, match_criteria):
-        """ :type match_criteria: MatchCriteria """
         self.match_criteria = match_criteria
 
     def matches(self, args, kwargs):
@@ -35,22 +34,24 @@ class Behaviour(object):
 
 
 class Result(object):
-    def __init__(self, async=False):
-        self.async = async
+    def __init__(self, future=False):
+        self.future = future
+        if future and not asyncio:
+            raise RuntimeError('Can only use async feature with Python 3.5+')
 
     def _get_result(self, args, kwargs):
         raise NotImplementedError()
 
     def get_result(self, args, kwargs):
-        if self.async:
+        if self.future:
             return asyncio.coroutine(partial(self._get_result, args, kwargs))()
         else:
             return self._get_result(args, kwargs)
 
 
 class ValueResult(Result):
-    def __init__(self, value, async=False):
-        super(ValueResult, self).__init__(async)
+    def __init__(self, value, future=False):
+        super(ValueResult, self).__init__(future)
         self.value = value
 
     def __eq__(self, other):
@@ -61,8 +62,8 @@ class ValueResult(Result):
 
 
 class ErrorResult(Result):
-    def __init__(self, exception, async=False):
-        super(ErrorResult, self).__init__(async)
+    def __init__(self, exception, future=False):
+        super(ErrorResult, self).__init__(future)
         self.exception = exception
 
     def __eq__(self, other):
@@ -73,8 +74,8 @@ class ErrorResult(Result):
 
 
 class ComputationResult(Result):
-    def __init__(self, function, async=False):
-        super(ComputationResult, self).__init__(async)
+    def __init__(self, function, future=False):
+        super(ComputationResult, self).__init__(future)
         self.function = function
 
     def __eq__(self, other):
@@ -85,12 +86,8 @@ class ComputationResult(Result):
 
 
 class BehaviourBuilder(object):
-    def __init__(self, mock, behaviour=None, async=False):
-        """ :type behaviour: Behaviour """
-        if async and not asyncio:
-            raise RuntimeError('Can only use async feature with Python 3.5+')
+    def __init__(self, mock, behaviour=None):
         self.mock = mock
-        self.async = async
         behaviour = behaviour or Behaviour()
         self.behaviour = behaviour
         self.name_defined = behaviour.name is not None
@@ -141,15 +138,27 @@ class BehaviourBuilder(object):
             getattr(self.mock, self.behaviour.name)._add_call_behaviour(self.behaviour)
 
     def then_return(self, value):
-        self._add_result(ValueResult(value, async=self.async))
+        self._add_result(ValueResult(value))
         return self
 
     def then_raise(self, exception):
-        self._add_result(ErrorResult(exception, async=self.async))
+        self._add_result(ErrorResult(exception))
         return self
 
     def then_compute(self, function):
-        self._add_result(ComputationResult(function, async=self.async))
+        self._add_result(ComputationResult(function))
+        return self
+
+    def then_return_future(self, value):
+        self._add_result(ValueResult(value, future=True))
+        return self
+
+    def then_raise_future(self, exception):
+        self._add_result(ErrorResult(exception, future=True))
+        return self
+
+    def then_compute_future(self, function):
+        self._add_result(ComputationResult(function, future=True))
         return self
 
     def _add_result(self, result):
