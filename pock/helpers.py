@@ -1,5 +1,5 @@
 from .matchers import AnyValueMatcher, AnyArgumentsMatcher, AnyKeywordArgumentsMatcher, AnyValuesMatcher
-from .expectation import ExpectationBuilder
+from .behaviour import BehaviourBuilder
 from .verification import VerificationBuilder
 
 try:
@@ -27,11 +27,11 @@ def context_manager(returning=None):
 
 
 def when(mock):
-    return ExpectationBuilder(mock)
+    return BehaviourBuilder(mock)
 
 
 def when_async(mock):
-    return ExpectationBuilder(mock, async=True)
+    return BehaviourBuilder(mock, async=True)
 
 
 def verify(mock):

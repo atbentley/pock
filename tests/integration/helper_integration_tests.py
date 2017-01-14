@@ -8,7 +8,7 @@ def mock():
     return Mock()
 
 
-def test_when_creates_expectation(mock):
+def test_when_creates_behaviour(mock):
     """ :type mock: Mock """
     when(mock).some_method('some_arg').then_return('some_value')
 

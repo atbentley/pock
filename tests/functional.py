@@ -25,7 +25,7 @@ def test_mocking_a_property():
     verify(property_mock).some_property
 
 
-def test_expectations_using_matchers():
+def test_behaviours_using_matchers():
     some_mock = mock()
     when(some_mock).method(1, any_value, a=3, b=any_value).then_return('a_value')
     assert some_mock.method(1, 2, a=3, b=4) == 'a_value'

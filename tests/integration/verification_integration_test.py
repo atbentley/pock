@@ -1,6 +1,6 @@
 import pytest
 
-from pock.expectation import Expectation, ValueResult
+from pock.behaviour import Behaviour, ValueResult
 from pock.mock import Mock
 from pock.verification import VerificationBuilder, VerificationError
 
@@ -26,7 +26,7 @@ def test_accessing_a_property_returns_true_if_that_property_was_called(verificat
     :type verification_builder: VerificationBuilder
     :type mock: Mock
     """
-    mock._add_property_expectation(Expectation('property', result=ValueResult(None)))
+    mock._add_property_behaviour(Behaviour('property', result=ValueResult(None)))
     mock.property
 
     assert verification_builder.property is True

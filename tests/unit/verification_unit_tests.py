@@ -5,7 +5,7 @@ from pock.verification import VerificationBuilder
 
 class FakeMock(object):
     def __init__(self):
-        self._property_expectations = []
+        self._property_behaviours = []
 
 
 @pytest.fixture

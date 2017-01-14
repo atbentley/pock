@@ -10,13 +10,13 @@ def mock():
 
 
 @pytest.fixture
-def expectation():
+def behaviour():
     class MatchCriteriaStub(object):
         pass
 
-    class ExpectationStub(object):
+    class BehaviourStub(object):
         def __init__(self):
-            self.name = 'exceptional_expectation'
+            self.name = 'exceptional_behaviour'
             self.match_criteria = MatchCriteriaStub()
 
         def matches(self, *args, **kwargs):
@@ -25,27 +25,27 @@ def expectation():
         def get_result(self, args=None, kwargs=None):
             return 587
 
-    return ExpectationStub()
+    return BehaviourStub()
 
 
-def test_add_call_expectation_adds_expectation(mock, expectation):
+def test_add_call_behaviour_adds_behaviour(mock, behaviour):
     """
     :type mock: Mock
-    :type expectation: Expectation
+    :type behaviour: Behaviour
     """
-    mock._add_call_expectation(expectation)
+    mock._add_call_behaviour(behaviour)
 
-    assert mock._call_expectations[expectation.match_criteria] == expectation
+    assert mock._call_behaviours[behaviour.match_criteria] == behaviour
 
 
-def test_add_property_expectation_adds_expectation(mock, expectation):
+def test_add_property_behaviour_adds_behaviour(mock, behaviour):
     """
     :type mock: Mock
-    :type expectation: Expectation
+    :type behaviour: Behaviour
     """
-    mock._add_property_expectation(expectation)
+    mock._add_property_behaviour(behaviour)
 
-    assert mock._property_expectations[expectation.name] == expectation
+    assert mock._property_behaviours[behaviour.name] == behaviour
 
 
 @pytest.mark.parametrize('param', overrides)
@@ -63,16 +63,16 @@ def test_getattribute_creates_sub_mock(mock):
     assert isinstance(sub_mock, Mock)
 
 
-def test_getattribute_adds_property_invocation(mock, expectation):
+def test_getattribute_adds_property_invocation(mock, behaviour):
     """
     :type mock: Mock
-    :type expectation: Expectation
+    :type behaviour: Behaviour
     """
-    mock._add_property_expectation(expectation)
+    mock._add_property_behaviour(behaviour)
 
-    getattr(mock, expectation.name)
+    getattr(mock, behaviour.name)
 
-    assert expectation.name in mock._property_invocations
+    assert behaviour.name in mock._property_invocations
 
 
 def test_getattribute_creates_different_sub_mocks(mock):
@@ -98,12 +98,12 @@ def test_getattribute_returns_self_when_accessing_call(mock):
     assert sub_mock is mock
 
 
-def test_call_returns_mock_and_adds_expectation_if_no_expectations_match(mock):
+def test_call_returns_mock_and_adds_behaviour_if_no_behaviours_match(mock):
     """ :type mock: Mock """
     new_mock = mock(1, 2)
 
     assert isinstance(new_mock, Mock)
-    assert mock._call_expectations[MatchCriteria(args=(1,2), kwargs={})].get_result() == new_mock
+    assert mock._call_behaviours[MatchCriteria(args=(1,2), kwargs={})].get_result() == new_mock
 
 
 def test_call_adds_call_invocation(mock):

@@ -8,7 +8,7 @@ except ImportError:
     asyncio = None
 
 
-class Expectation(object):
+class Behaviour(object):
     def __init__(self, name=None, match_criteria=None, result=None):
         self.name = name
         self.match_criteria = match_criteria
@@ -84,33 +84,33 @@ class ComputationResult(Result):
         return self.function(*args, **kwargs)
 
 
-class ExpectationBuilder(object):
-    def __init__(self, mock, expectation=None, async=False):
-        """ :type expectation: Expectation """
+class BehaviourBuilder(object):
+    def __init__(self, mock, behaviour=None, async=False):
+        """ :type behaviour: Behaviour """
         if async and not asyncio:
             raise RuntimeError('Can only use async feature with Python 3.5+')
         self.mock = mock
         self.async = async
-        expectation = expectation or Expectation()
-        self.expectation = expectation
-        self.name_defined = expectation.name is not None
-        self.match_criteria_defined = expectation.match_criteria is not None
+        behaviour = behaviour or Behaviour()
+        self.behaviour = behaviour
+        self.name_defined = behaviour.name is not None
+        self.match_criteria_defined = behaviour.match_criteria is not None
 
     def __getattribute__(self, name):
-        name_has_been_defined = super(ExpectationBuilder, self).__getattribute__('name_defined')
+        name_has_been_defined = super(BehaviourBuilder, self).__getattribute__('name_defined')
         if not name_has_been_defined:
             self.name_defined = True
-            self.define_expectation_name(name)
+            self.define_behaviour_name(name)
             return self
-        return super(ExpectationBuilder, self).__getattribute__(name)
+        return super(BehaviourBuilder, self).__getattribute__(name)
 
     def __call__(self, *args, **kwargs):
-        name_has_been_defined = super(ExpectationBuilder, self).__getattribute__('name_defined')
+        name_has_been_defined = super(BehaviourBuilder, self).__getattribute__('name_defined')
         if not name_has_been_defined:
             self.name_defined = True
-            self.define_expectation_name('__call__')
+            self.define_behaviour_name('__call__')
 
-        match_criteria_has_been_defined = super(ExpectationBuilder, self).__getattribute__('match_criteria_defined')
+        match_criteria_has_been_defined = super(BehaviourBuilder, self).__getattribute__('match_criteria_defined')
         if not match_criteria_has_been_defined:
             self.match_criteria_defined = True
             self.define_match_criteria(args, kwargs)
@@ -119,26 +119,26 @@ class ExpectationBuilder(object):
         raise TypeError("'{name}' object is not callable".format(name=self.__class__.__name__))
 
     def __getitem__(self, item):
-        name_has_been_defined = super(ExpectationBuilder, self).__getattribute__('name_defined')
+        name_has_been_defined = super(BehaviourBuilder, self).__getattribute__('name_defined')
         if not name_has_been_defined:
             self.name_defined = True
-            self.define_expectation_name('__getitem__')
+            self.define_behaviour_name('__getitem__')
             self.match_criteria_defined = True
             self.define_match_criteria((item,), {})
             return self
 
         raise TypeError("'{name}' object has no attribute __getitem__".format(name=self.__class__.__name__))
 
-    def define_expectation_name(self, name):
-        self.expectation.name = name
+    def define_behaviour_name(self, name):
+        self.behaviour.name = name
 
     def define_match_criteria(self, args, kwargs):
         match_criteria = MatchCriteria(args, kwargs)
-        self.expectation.set_match_criteria(match_criteria)
-        if self.expectation.name == '__getitem__':
-            self.mock._add_item_expectation(self.expectation)
+        self.behaviour.set_match_criteria(match_criteria)
+        if self.behaviour.name == '__getitem__':
+            self.mock._add_item_behaviour(self.behaviour)
         else:
-            getattr(self.mock, self.expectation.name)._add_call_expectation(self.expectation)
+            getattr(self.mock, self.behaviour.name)._add_call_behaviour(self.behaviour)
 
     def then_return(self, value):
         self._add_result(ValueResult(value, async=self.async))
@@ -155,5 +155,5 @@ class ExpectationBuilder(object):
     def _add_result(self, result):
         if not self.match_criteria_defined:
             self.match_criteria_defined = True
-            self.mock._add_property_expectation(self.expectation)
-        self.expectation.add_result(result)
+            self.mock._add_property_behaviour(self.behaviour)
+        self.behaviour.add_result(result)

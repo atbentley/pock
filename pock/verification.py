@@ -14,7 +14,7 @@ class VerificationBuilder(object):
         name_has_been_defined = super(VerificationBuilder, self).__getattribute__('name') is not None
         if not name_has_been_defined:
             self.name = name
-            if self.name in self.mock._property_expectations:
+            if self.name in self.mock._property_behaviours:
                 return self.has_accessed_property()
             else:
                 return self.has_been_called_with
