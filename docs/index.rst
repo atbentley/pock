@@ -29,7 +29,7 @@ Pock provides an interface for creating and verifying mock behaviour that is nat
 
 Some select features of Pock are:
 
-- Mock and verify all access patterns in Python
+- Mock and verify a range of access patterns in Python
 - Match arguments during mock creation and verification
 - Mock higher level Python objects such as context managers and generators
 - Seamlessly mock asyncio code
@@ -70,4 +70,4 @@ See the full :ref:`changelog` for details.
 License
 -------
 
-Pock is licensed under the MIT License, see the source code for the full license text.
+Pock is licensed under the MIT License, see the `source code for the full license text <https://raw.githubusercontent.com/atbentley/pock/master/LICENSE.txt>`_.
