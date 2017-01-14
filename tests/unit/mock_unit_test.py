@@ -109,6 +109,15 @@ def test_getattribute_raises_attribute_error_when_strict(strict_mock):
         strict_mock.nope()
 
 
+def test_getattribute_does_not_raise_attribute_error_when_specced():
+    specced_mock = Mock(spec=['sample'])
+
+    assert specced_mock._strict is True
+    assert specced_mock.sample()
+    with pytest.raises(AttributeError):
+        specced_mock.nope()
+
+
 def test_call_returns_mock_and_adds_behaviour_if_no_behaviours_match(mock):
     """ :type mock: Mock """
     new_mock = mock(1, 2)

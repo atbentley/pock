@@ -5,6 +5,8 @@ from .matchers import MatchCriteria
 
 
 overrides = (
+    '_spec',
+    '_strict',
     '_add_call_behaviour',
     '_add_property_behaviour',
     '_add_item_behaviour',
@@ -16,7 +18,6 @@ overrides = (
     '_property_invocations',
     '_item_invocations',
     '_sub_mocks',
-    '_strict',
     '__iter__',
     '__repr__',
     '__str__',
@@ -25,7 +26,9 @@ overrides = (
 
 
 class Mock(object):
-    def __init__(self, strict=False):
+    def __init__(self, spec=None, strict=False):
+        self._spec = spec or []
+        self._strict = strict or bool(spec)
         self._call_behaviours = OrderedDict()
         self._property_behaviours = OrderedDict()
         self._item_behaviours = OrderedDict()
@@ -34,7 +37,6 @@ class Mock(object):
         self._item_invocations = []
         self._sub_mocks = OrderedDict()
         self._item_mocks = OrderedDict()
-        self._strict = strict
 
     def _add_call_behaviour(self, behaviour):
         self._call_behaviours[behaviour.match_criteria] = behaviour
@@ -63,7 +65,7 @@ class Mock(object):
         elif name in self._sub_mocks:
             return self._sub_mocks[name]
         else:
-            if self._strict:
+            if self._strict and name not in self._spec:
                 return super(Mock, self).__getattribute__(name)
             else:
                 if name == '__call__':
