@@ -3,8 +3,8 @@ project = u'Pock'
 copyright = u'2017, Andrew Bentley'
 author = u'Andrew Bentley'
 
-version = u'0.0.4'
-release = u'0.0.4'
+version = u'0.0.5'
+release = u'0.0.5'
 
 extensions = []
 
