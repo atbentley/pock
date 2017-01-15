@@ -33,6 +33,7 @@ Some of Pock's features include:
 - Match arguments during mock creation and verification
 - Mock higher level Python objects such as context managers and generators
 - Seamlessly mock asyncio code
+- Support for magic mocks, strict mocks and specced mocks
 
 
 To learn more, choose a topic from the navigation on the left or dive right into the :ref:`quickstart`.

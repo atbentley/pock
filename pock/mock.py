@@ -1,3 +1,4 @@
+import inspect
 from collections import OrderedDict
 
 from .behaviour import ValueResult, Behaviour
@@ -26,8 +27,16 @@ overrides = (
 
 
 class Mock(object):
-    def __init__(self, spec=None, strict=False):
-        self._spec = spec or []
+    def __init__(self, spec=None, extra_spec=None, strict=False):
+        if spec is None:
+            self._spec = []
+        elif isinstance(spec, (tuple, set, list)):
+            self._spec = spec
+        else:
+            members = inspect.getmembers(spec)
+            self._spec = [member[0] for member in members]
+            if extra_spec:
+                self._spec.extend(extra_spec)
         self._strict = strict or bool(spec)
         self._call_behaviours = OrderedDict()
         self._property_behaviours = OrderedDict()

@@ -10,8 +10,8 @@ except ImportError:
     from .mock import Mock
 
 
-def mock(spec=None, strict=False):
-    return Mock(spec=spec, strict=strict)
+def mock(spec=None, extra_spec=None, strict=False):
+    return Mock(spec=spec, extra_spec=extra_spec, strict=strict)
 
 
 def context_manager(returning=None):
