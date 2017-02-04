@@ -21,7 +21,7 @@ def test_verification_builder_raises_verification_error_when_not_called(verifica
         verification_builder.something(1)
 
 
-def test_accessing_a_property_returns_true_if_that_property_was_called(verification_builder, mock):
+def test_accessing_a_property_returns_a_list_of_invocations(verification_builder, mock):
     """
     :type verification_builder: VerificationBuilder
     :type mock: Mock
@@ -29,4 +29,4 @@ def test_accessing_a_property_returns_true_if_that_property_was_called(verificat
     mock._add_property_behaviour(Behaviour('property', result=ValueResult(None)))
     mock.property
 
-    assert verification_builder.property is True
+    assert verification_builder.property == ['property']

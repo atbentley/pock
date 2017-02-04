@@ -38,15 +38,13 @@ class VerificationBuilder(object):
         sub_mock = getattr(self.mock, self.name)
         values = list(args)
         values.extend(kwargs.values())
-        if any(isinstance(value, Matcher) for value in values):
-            # One of the values is a matcher so we need to construct a match criteria
-            match_criteria = MatchCriteria(args, kwargs)
-            for called_args, called_kwargs in sub_mock._call_invocations:
-                if match_criteria.matches(called_args, called_kwargs):
-                    return called_args, called_kwargs
-        elif (args, kwargs) in sub_mock._call_invocations:
-            # All values are basic values, just compare to the invoked args and kwargs
-            return args, kwargs
+        invocations = []
+        match_criteria = MatchCriteria(args, kwargs)
+        for called_args, called_kwargs in sub_mock._call_invocations:
+            if match_criteria.matches(called_args, called_kwargs):
+                invocations.append((called_args, called_kwargs))
+        if invocations:
+            return invocations
 
         params = []
         params.extend([str(arg) for arg in args])
@@ -56,20 +54,21 @@ class VerificationBuilder(object):
         raise VerificationError(msg)
 
     def has_accessed_property(self):
-        if self.name in self.mock._property_invocations:
-            return True
+        count = self.mock._property_invocations.count(self.name)
+        if count:
+            return [self.name] * count
         else:
             msg = "Expected access to property '{property}', but no such access was made.".format(property=self.name)
             raise VerificationError(msg)
 
     def has_accessed_item(self, item):
-        if isinstance(item, Matcher):
-            match_criteria = MatchCriteria((item,), {})
-            for called_item in self.mock._item_invocations:
-                if match_criteria.matches((called_item,), {}):
-                    return called_item
-        elif item in self.mock._item_invocations:
-            return item
+        invocations = []
+        match_criteria = MatchCriteria((item,), {})
+        for called_item in self.mock._item_invocations:
+            if match_criteria.matches((called_item,), {}):
+                invocations.append(called_item)
+        if invocations:
+            return invocations
 
         msg = "Expected access to item {item}, but no such access was made.".format(item=item)
         raise VerificationError(msg)
