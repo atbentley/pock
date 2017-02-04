@@ -1,8 +1,9 @@
-from .helpers import mock, context_manager, when, verify, verify_once, any_value, any_args, any_kwargs, any_values
+from .helpers import (
+    mock, context_manager, when, verify, verify_once, verify_n, any_value, any_args, any_kwargs, any_values)
 from .verification import VerificationError
 
 __version__ = '0.0.5'
 __all__ = (
-    'mock', 'context_manager', 'when', 'verify', 'verify_once', 'any_value', 'any_args', 'any_kwargs', 'any_values',
-    'VerificationError'
+    'mock', 'context_manager', 'when', 'verify', 'verify_once', 'verify_n', 'any_value', 'any_args', 'any_kwargs',
+    'any_values', 'VerificationError'
 )
