@@ -6,9 +6,13 @@ class VerificationError(Exception):
 
 
 class VerificationBuilder(object):
-    def __init__(self, mock):
+    def __init__(self, mock, test=None):
         self.mock = mock
+        self.test = test
         self.name = None
+
+    def passes_test(self, results):
+        return not self.test or self.test(results)
 
     def __getattribute__(self, name):
         name_has_been_defined = super(VerificationBuilder, self).__getattribute__('name') is not None
@@ -43,7 +47,7 @@ class VerificationBuilder(object):
         for called_args, called_kwargs in sub_mock._call_invocations:
             if match_criteria.matches(called_args, called_kwargs):
                 invocations.append((called_args, called_kwargs))
-        if invocations:
+        if invocations and self.passes_test(invocations):
             return invocations
 
         params = []
@@ -67,7 +71,7 @@ class VerificationBuilder(object):
         for called_item in self.mock._item_invocations:
             if match_criteria.matches((called_item,), {}):
                 invocations.append(called_item)
-        if invocations:
+        if invocations and self.passes_test(invocations):
             return invocations
 
         msg = "Expected access to item {item}, but no such access was made.".format(item=item)

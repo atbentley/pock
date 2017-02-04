@@ -34,6 +34,10 @@ def verify(mock):
     return VerificationBuilder(mock)
 
 
+def verify_once(mock):
+    return VerificationBuilder(mock, test=lambda result: len(result) == 1)
+
+
 any_value = AnyValueMatcher()
 any_args = AnyArgumentsMatcher()
 any_kwargs = AnyKeywordArgumentsMatcher()
