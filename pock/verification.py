@@ -53,7 +53,7 @@ class VerificationBuilder(object):
             if match_criteria.matches(called_args, called_kwargs):
                 invocations.append((called_args, called_kwargs))
         if self.passes_test(invocations):
-            return invocations
+            return VerificationResult(invocations)
         else:
             params = []
             params.extend([str(arg) for arg in args])
@@ -66,7 +66,7 @@ class VerificationBuilder(object):
         count = self.mock._property_invocations.count(self.name)
         invocations = [self.name] * count
         if self.passes_test(invocations):
-            return invocations
+            return VerificationResult(invocations)
         else:
             msg = self.get_error_message('access', 'accesses', 'property {0}'.format(self.name), count)
             raise VerificationError(msg)
@@ -78,7 +78,15 @@ class VerificationBuilder(object):
             if match_criteria.matches((called_item,), {}):
                 invocations.append(called_item)
         if self.passes_test(invocations):
-            return invocations
+            return VerificationResult(invocations)
         else:
             msg = self.get_error_message('access', 'accesses', 'item {0}'.format(item), len(invocations))
             raise VerificationError(msg)
+
+
+class VerificationResult(object):
+    def __init__(self, results):
+        self.results = results
+
+    def __iter__(self):
+        return iter(self.results)

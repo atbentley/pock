@@ -29,4 +29,4 @@ def test_accessing_a_property_returns_a_list_of_invocations(verification_builder
     mock._add_property_behaviour(Behaviour('property', result=ValueResult(None)))
     mock.property
 
-    assert verification_builder.property == ['property']
+    assert verification_builder.property.results == ['property']
