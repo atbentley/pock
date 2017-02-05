@@ -45,6 +45,11 @@ def verify_n(mock, n):
     return VerificationBuilder(mock, lambda result: len(result) == n, msg)
 
 
+def verify_never(mock):
+    msg = 'Expected zero {accesses} to {thing}, but {amount} {were_was} made'
+    return VerificationBuilder(mock, lambda result: len(result) == 0, msg)
+
+
 any_value = AnyValueMatcher()
 any_args = AnyArgumentsMatcher()
 any_kwargs = AnyKeywordArgumentsMatcher()
