@@ -31,15 +31,18 @@ def when(mock):
 
 
 def verify(mock):
-    return VerificationBuilder(mock)
+    msg = 'Expected at least one {access} to {thing}, but no such {access} was made'
+    return VerificationBuilder(mock, lambda result: len(result) > 0, msg)
 
 
 def verify_once(mock):
-    return VerificationBuilder(mock, test=lambda result: len(result) == 1)
+    msg = 'Expected exactly one {access} to {thing}, but {amount} {were_was} made'
+    return VerificationBuilder(mock, lambda result: len(result) == 1, msg)
 
 
 def verify_n(mock, n):
-    return VerificationBuilder(mock, test=lambda result: len(result) == n)
+    msg = 'Expected exactly {n} {{accesses}} to {{thing}}, but {{amount}} {{were_was}} made'.format(n=n)
+    return VerificationBuilder(mock, lambda result: len(result) == n, msg)
 
 
 any_value = AnyValueMatcher()

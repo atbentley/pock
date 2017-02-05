@@ -1,4 +1,4 @@
-from .matchers import Matcher, MatchCriteria
+from .matchers import MatchCriteria
 
 
 class VerificationError(Exception):
@@ -6,13 +6,18 @@ class VerificationError(Exception):
 
 
 class VerificationBuilder(object):
-    def __init__(self, mock, test=None):
+    def __init__(self, mock, test, msg):
         self.mock = mock
         self.test = test
+        self.msg = msg
         self.name = None
 
     def passes_test(self, results):
         return not self.test or self.test(results)
+
+    def get_error_message(self, access, accesses, thing, amount):
+        were_was = 'was' if amount == 1 else 'were'
+        return self.msg.format(access=access, accesses=accesses, thing=thing, amount=amount, were_was=were_was)
 
     def __getattribute__(self, name):
         name_has_been_defined = super(VerificationBuilder, self).__getattribute__('name') is not None
@@ -47,22 +52,23 @@ class VerificationBuilder(object):
         for called_args, called_kwargs in sub_mock._call_invocations:
             if match_criteria.matches(called_args, called_kwargs):
                 invocations.append((called_args, called_kwargs))
-        if invocations and self.passes_test(invocations):
+        if self.passes_test(invocations):
             return invocations
-
-        params = []
-        params.extend([str(arg) for arg in args])
-        params.extend(['{0}={1}'.format(str(item[0]), str(item[1])) for item in kwargs.items()])
-        msg = "Expected call to {method}({params}), but no such call was made.".format(
-            method=self.name, params=', '.join(params))
-        raise VerificationError(msg)
+        else:
+            params = []
+            params.extend([str(arg) for arg in args])
+            params.extend(['{0}={1}'.format(str(item[0]), str(item[1])) for item in kwargs.items()])
+            thing = '{method}({params})'.format(method=self.name, params=', '.join(params))
+            msg = self.get_error_message('call', 'calls', thing, len(invocations))
+            raise VerificationError(msg)
 
     def has_accessed_property(self):
         count = self.mock._property_invocations.count(self.name)
-        if count:
-            return [self.name] * count
+        invocations = [self.name] * count
+        if self.passes_test(invocations):
+            return invocations
         else:
-            msg = "Expected access to property '{property}', but no such access was made.".format(property=self.name)
+            msg = self.get_error_message('access', 'accesses', 'property {0}'.format(self.name), count)
             raise VerificationError(msg)
 
     def has_accessed_item(self, item):
@@ -71,8 +77,8 @@ class VerificationBuilder(object):
         for called_item in self.mock._item_invocations:
             if match_criteria.matches((called_item,), {}):
                 invocations.append(called_item)
-        if invocations and self.passes_test(invocations):
+        if self.passes_test(invocations):
             return invocations
-
-        msg = "Expected access to item {item}, but no such access was made.".format(item=item)
-        raise VerificationError(msg)
+        else:
+            msg = self.get_error_message('access', 'accesses', 'item {0}'.format(item), len(invocations))
+            raise VerificationError(msg)

@@ -12,7 +12,7 @@ def mock():
 
 @pytest.fixture
 def verification_builder(mock):
-    return VerificationBuilder(mock)
+    return VerificationBuilder(mock, lambda result: len(result) > 0, 'error')
 
 
 def test_verification_builder_raises_verification_error_when_not_called(verification_builder):
